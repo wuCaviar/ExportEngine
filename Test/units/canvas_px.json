@@ -1,0 +1,67 @@
+{
+    "canvas": {
+        "unit": "px",
+        "width": 2000,
+        "height": 1500,
+        "dpiX": 240,
+        "dpiY": 240,
+        "background": {
+            "c": 0,
+            "m": 0,
+            "y": 0,
+            "k": 5,
+            "a": 1.0
+        },
+        "rects": [
+            {
+                "x": 50,
+                "y": 50,
+                "width": 400,
+                "height": 300,
+                "z": 1,
+                "fillColor": {
+                    "c": 0,
+                    "m": 100,
+                    "y": 100,
+                    "k": 0,
+                    "a": 1.0
+                },
+                "strokeColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 100,
+                    "a": 1.0
+                },
+                "strokeWidth": 2,
+                "cornerRadius": 0,
+                "lineStyle": "solid"
+            },
+            {
+                "unit": "px",
+                "x": 500,
+                "y": 50,
+                "width": 400,
+                "height": 300,
+                "z": 2,
+                "fillColor": {
+                    "c": 100,
+                    "m": 0,
+                    "y": 0,
+                    "k": 0,
+                    "a": 0.8
+                },
+                "strokeColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 80,
+                    "a": 1.0
+                },
+                "strokeWidth": 3,
+                "cornerRadius": 0,
+                "lineStyle": "solid"
+            }
+        ]
+    }
+}

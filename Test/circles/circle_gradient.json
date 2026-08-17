@@ -1,0 +1,182 @@
+{
+    "canvas": {
+        "width": 2000,
+        "height": 1500,
+        "dpiX": 300,
+        "dpiY": 300,
+        "background": {
+            "c": 0,
+            "m": 0,
+            "y": 0,
+            "k": 5,
+            "a": 1.0
+        },
+        "circles": [
+            {
+                "cx": 250,
+                "cy": 250,
+                "radiusX": 200,
+                "radiusY": 200,
+                "z": 1,
+                "strokeWidth": 0,
+                "lineStyle": "solid",
+                "gradient": {
+                    "type": "radial",
+                    "cx": 0.5,
+                    "cy": 0.5,
+                    "r": 0.5,
+                    "stops": [
+                        {
+                            "offset": 0.0,
+                            "color": {
+                                "c": 0,
+                                "m": 0,
+                                "y": 0,
+                                "k": 0,
+                                "a": 1.0
+                            }
+                        },
+                        {
+                            "offset": 1.0,
+                            "color": {
+                                "c": 100,
+                                "m": 0,
+                                "y": 0,
+                                "k": 0,
+                                "a": 1.0
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                "cx": 700,
+                "cy": 250,
+                "radiusX": 200,
+                "radiusY": 200,
+                "z": 2,
+                "strokeWidth": 0,
+                "lineStyle": "solid",
+                "gradient": {
+                    "type": "radial",
+                    "cx": 0.3,
+                    "cy": 0.3,
+                    "r": 0.7,
+                    "stops": [
+                        {
+                            "offset": 0.0,
+                            "color": {
+                                "c": 0,
+                                "m": 0,
+                                "y": 0,
+                                "k": 0,
+                                "a": 1.0
+                            }
+                        },
+                        {
+                            "offset": 0.5,
+                            "color": {
+                                "c": 0,
+                                "m": 100,
+                                "y": 0,
+                                "k": 0,
+                                "a": 1.0
+                            }
+                        },
+                        {
+                            "offset": 1.0,
+                            "color": {
+                                "c": 0,
+                                "m": 0,
+                                "y": 100,
+                                "k": 0,
+                                "a": 1.0
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                "cx": 1150,
+                "cy": 250,
+                "radiusX": 200,
+                "radiusY": 200,
+                "z": 3,
+                "strokeColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 100,
+                    "a": 1.0
+                },
+                "strokeWidth": 2,
+                "lineStyle": "solid",
+                "gradient": {
+                    "type": "radial",
+                    "cx": 0.7,
+                    "cy": 0.3,
+                    "r": 0.6,
+                    "stops": [
+                        {
+                            "offset": 0.0,
+                            "color": {
+                                "c": 0,
+                                "m": 0,
+                                "y": 100,
+                                "k": 0,
+                                "a": 1.0
+                            }
+                        },
+                        {
+                            "offset": 1.0,
+                            "color": {
+                                "c": 0,
+                                "m": 100,
+                                "y": 0,
+                                "k": 0,
+                                "a": 1.0
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                "cx": 500,
+                "cy": 700,
+                "radiusX": 150,
+                "radiusY": 250,
+                "z": 4,
+                "strokeWidth": 0,
+                "lineStyle": "solid",
+                "gradient": {
+                    "type": "radial",
+                    "cx": 0.5,
+                    "cy": 0.5,
+                    "r": 0.5,
+                    "stops": [
+                        {
+                            "offset": 0.0,
+                            "color": {
+                                "c": 100,
+                                "m": 100,
+                                "y": 0,
+                                "k": 0,
+                                "a": 1.0
+                            }
+                        },
+                        {
+                            "offset": 1.0,
+                            "color": {
+                                "c": 0,
+                                "m": 0,
+                                "y": 0,
+                                "k": 100,
+                                "a": 1.0
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}

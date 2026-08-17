@@ -1,0 +1,18 @@
+{
+    "canvas": {
+        "unit": "mm",
+        "width": 10,
+        "height": 10,
+        "dpiX": 300,
+        "dpiY": 600,
+        "rects": [
+            {
+                "x": 1,
+                "y": 1,
+                "width": 1,
+                "height": 1,
+                "unit": "mm"
+            }
+        ]
+    }
+}

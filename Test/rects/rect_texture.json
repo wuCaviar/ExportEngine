@@ -1,0 +1,120 @@
+{
+    "canvas": {
+        "width": 7220,
+        "height": 6000,
+        "dpiX": 300,
+        "dpiY": 300,
+        "background": {
+            "a": 1.0,
+            "c": 0.0,
+            "m": 0.0,
+            "y": 0.0,
+            "k": 0.0
+        },
+        "rects": [
+            {
+                "x": 3650,
+                "y": 50,
+                "width": 500,
+                "height": 350,
+                "z": 1,
+                "textureFill": {
+                    "filePath": "D:\\tif图片\\浅蓝底汽车.tif",
+                    "useOriginalSize": false,
+                    "customWidth": 30,
+                    "customHeight": 30
+                }
+            },
+            {
+                "x": 0,
+                "y": 0,
+                "width": 3602,
+                "height": 3602,
+                "z": 9,
+                "textureFill": {
+                    "filePath": "D:\\tif图片\\浅蓝底汽车.tif",
+                    "useOriginalSize": true
+                }
+            },
+            {
+                "x": 4750,
+                "y": 50,
+                "width": 500,
+                "height": 350,
+                "z": 3,
+                "textureFill": {
+                    "filePath": "D:\\tif图片\\浅蓝底汽车.tif",
+                    "useOriginalSize": false,
+                    "customWidth": 20,
+                    "customHeight": 20,
+                    "offsetX": -5,
+                    "offsetY": 8
+                }
+            },
+            {
+                "x": 5300,
+                "y": 50,
+                "width": 500,
+                "height": 350,
+                "z": 4,
+                "textureFill": {
+                    "filePath": "D:\\tif图片\\浅蓝底汽车.tif",
+                    "useOriginalSize": false,
+                    "customWidth": 60,
+                    "customHeight": 60
+                }
+            },
+            {
+                "x": 3650,
+                "y": 480,
+                "width": 700,
+                "height": 400,
+                "z": 5,
+                "cornerRadius": 60,
+                "textureFill": {
+                    "filePath": "D:\\tif图片\\浅蓝底汽车.tif",
+                    "useOriginalSize": false,
+                    "customWidth": 80,
+                    "customHeight": 40
+                }
+            },
+            {
+                "x": 4400,
+                "y": 480,
+                "width": 700,
+                "height": 400,
+                "z": 6,
+                "textureFill": {
+                    "filePath": "D:\\tif图片\\浅蓝底汽车.tif",
+                    "useOriginalSize": false,
+                    "customWidth": 50,
+                    "customHeight": 50,
+                    "offsetX": 15,
+                    "offsetY": 15
+                }
+            },
+            {
+                "x": 3650,
+                "y": 950,
+                "width": 2500,
+                "height": 2500,
+                "z": 7,
+                "textureFill": {
+                    "filePath": "D:\\WorkSpace\\Image\\png\\color.png",
+                    "useOriginalSize": true
+                }
+            },
+            {
+                "x": 3650,
+                "y": 3750,
+                "width": 2000,
+                "height": 2000,
+                "z": 8,
+                "textureFill": {
+                    "filePath": "D:\\WorkSpace\\Image\\jpg\\12121.jpg",
+                    "useOriginalSize": true
+                }
+            }
+        ]
+    }
+}

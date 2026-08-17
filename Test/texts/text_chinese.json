@@ -1,0 +1,935 @@
+{
+    "canvas": {
+        "width": 4000,
+        "height": 6975,
+        "dpiX": 150,
+        "dpiY": 150,
+        "background": {
+            "c": 0,
+            "m": 0,
+            "y": 0,
+            "k": 0,
+            "a": 1.0
+        },
+        "texts": [
+            {
+                "comment": "宋体 36px 常规",
+                "x": 120,
+                "y": 120,
+                "z": 1,
+                "content": "宋体 SimSun Regular：春眠不觉晓，处处闻啼鸟",
+                "fontFamily": "SimSun",
+                "fontSize": 36,
+                "bold": false,
+                "italic": false,
+                "textColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 100,
+                    "a": 1.0
+                }
+            },
+            {
+                "comment": "宋体粗体 36px",
+                "x": 120,
+                "y": 225,
+                "z": 2,
+                "content": "宋体粗体 SimSun Bold：夜来风雨声，花落知多少",
+                "fontFamily": "SimSun",
+                "fontSize": 36,
+                "bold": true,
+                "italic": false,
+                "textColor": {
+                    "c": 100,
+                    "m": 0,
+                    "y": 0,
+                    "k": 0,
+                    "a": 1.0
+                }
+            },
+            {
+                "comment": "黑体 36px",
+                "x": 120,
+                "y": 345,
+                "z": 3,
+                "content": "黑体 SimHei：白日依山尽，黄河入海流",
+                "fontFamily": "SimHei",
+                "fontSize": 36,
+                "bold": false,
+                "italic": false,
+                "textColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 100,
+                    "a": 1.0
+                }
+            },
+            {
+                "comment": "楷体 36px",
+                "x": 120,
+                "y": 465,
+                "z": 4,
+                "content": "楷体 KaiTi：欲穷千里目，更上一层楼",
+                "fontFamily": "KaiTi",
+                "fontSize": 36,
+                "bold": false,
+                "italic": false,
+                "textColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 100,
+                    "a": 1.0
+                }
+            },
+            {
+                "comment": "微软雅黑 36px",
+                "x": 120,
+                "y": 585,
+                "z": 5,
+                "content": "微软雅黑 Microsoft YaHei：轻舟已过万重山",
+                "fontFamily": "Microsoft YaHei",
+                "fontSize": 36,
+                "bold": false,
+                "italic": false,
+                "textColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 100,
+                    "a": 1.0
+                }
+            },
+            {
+                "comment": "微软雅黑粗斜体 36px",
+                "x": 120,
+                "y": 690,
+                "z": 6,
+                "content": "微软雅黑 BoldItalic：两岸猿声啼不住",
+                "fontFamily": "Microsoft YaHei",
+                "fontSize": 36,
+                "bold": true,
+                "italic": true,
+                "textColor": {
+                    "c": 0,
+                    "m": 100,
+                    "y": 0,
+                    "k": 0,
+                    "a": 1.0
+                }
+            },
+            {
+                "comment": "宋体小字 24px",
+                "x": 120,
+                "y": 900,
+                "z": 7,
+                "content": "宋体小字 24px：床前明月光，疑是地上霜。举头望明月，低头思故乡。",
+                "fontFamily": "SimSun",
+                "fontSize": 24,
+                "bold": false,
+                "italic": false,
+                "textColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 80,
+                    "a": 1.0
+                }
+            },
+            {
+                "comment": "中英混合 SimSun 28px",
+                "x": 120,
+                "y": 960,
+                "z": 8,
+                "content": "中英混合 Mixed：Hello World — 你好世界",
+                "fontFamily": "SimSun",
+                "fontSize": 28,
+                "bold": false,
+                "italic": false,
+                "textColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 100,
+                    "k": 0,
+                    "a": 1.0
+                }
+            },
+            {
+                "comment": "中英混合 Microsoft YaHei 28px",
+                "x": 120,
+                "y": 1065,
+                "z": 9,
+                "content": "中英混合 YaHei：CJK Unified Ideographs — 中日韩统一表意文字",
+                "fontFamily": "Microsoft YaHei",
+                "fontSize": 28,
+                "bold": false,
+                "italic": false,
+                "textColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 100,
+                    "k": 0,
+                    "a": 1.0
+                }
+            },
+            {
+                "comment": "宋体大标题 100px",
+                "x": 120,
+                "y": 1215,
+                "z": 10,
+                "content": "大标题 — 100px 宋体粗体",
+                "fontFamily": "SimSun",
+                "fontSize": 100,
+                "bold": true,
+                "italic": false,
+                "textColor": {
+                    "c": 100,
+                    "m": 0,
+                    "y": 0,
+                    "k": 0,
+                    "a": 1.0
+                }
+            },
+            {
+                "comment": "黑体大标题 48px",
+                "x": 120,
+                "y": 1380,
+                "z": 11,
+                "content": "中文标题 — 48px 黑体 SimHei",
+                "fontFamily": "SimHei",
+                "fontSize": 48,
+                "bold": false,
+                "italic": false,
+                "textColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 100,
+                    "a": 1.0
+                }
+            },
+            {
+                "comment": "楷体旋转 5°",
+                "x": 120,
+                "y": 1530,
+                "z": 12,
+                "content": "楷体旋转 5° — KaiTi Rotated",
+                "fontFamily": "KaiTi",
+                "fontSize": 36,
+                "bold": false,
+                "italic": false,
+                "textColor": {
+                    "c": 0,
+                    "m": 100,
+                    "y": 0,
+                    "k": 0,
+                    "a": 1.0
+                }
+            },
+            {
+                "comment": "RGB 颜色中文",
+                "x": 120,
+                "y": 1680,
+                "z": 13,
+                "content": "RGBA 颜色 — R=255 G=128 B=64 (橙色)",
+                "fontFamily": "SimHei",
+                "fontSize": 36,
+                "bold": false,
+                "italic": false,
+                "textColor": {
+                    "a": 1.0,
+                    "c": 0.0,
+                    "m": 49.8,
+                    "y": 74.9,
+                    "k": 0.0
+                }
+            },
+            {
+                "comment": "特殊符号",
+                "x": 120,
+                "y": 1830,
+                "z": 14,
+                "content": "特殊符号测试：①②③④⑤ ★☆♪♫『』「」［］｛｝ ¥€£",
+                "fontFamily": "SimSun",
+                "fontSize": 28,
+                "bold": false,
+                "italic": false,
+                "textColor": {
+                    "c": 0,
+                    "m": 100,
+                    "y": 0,
+                    "k": 0,
+                    "a": 1.0
+                }
+            },
+            {
+                "comment": "═══ 分隔线 ════════════════════════════════════════════",
+                "x": 60,
+                "y": 2010,
+                "z": 15,
+                "content": "═══ Bold / Italic 组合覆盖 ══════════════════════════════════════════════",
+                "fontFamily": "SimHei",
+                "fontSize": 22,
+                "bold": true,
+                "italic": false,
+                "textColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 40,
+                    "a": 1.0
+                }
+            },
+            {
+                "comment": "SimSun 斜体",
+                "x": 120,
+                "y": 2115,
+                "z": 16,
+                "content": "宋体斜体 SimSun Italic：春眠不觉晓，处处闻啼鸟",
+                "fontFamily": "SimSun",
+                "fontSize": 36,
+                "bold": false,
+                "italic": true,
+                "textColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 100,
+                    "a": 1.0
+                }
+            },
+            {
+                "comment": "SimSun 粗斜体",
+                "x": 120,
+                "y": 2227,
+                "z": 17,
+                "content": "宋体粗斜体 SimSun BoldItalic：夜来风雨声，花落知多少",
+                "fontFamily": "SimSun",
+                "fontSize": 36,
+                "bold": true,
+                "italic": true,
+                "textColor": {
+                    "c": 100,
+                    "m": 0,
+                    "y": 0,
+                    "k": 0,
+                    "a": 1.0
+                }
+            },
+            {
+                "comment": "SimHei 粗体",
+                "x": 120,
+                "y": 2340,
+                "z": 18,
+                "content": "黑体粗体 SimHei Bold：白日依山尽，黄河入海流",
+                "fontFamily": "SimHei",
+                "fontSize": 36,
+                "bold": true,
+                "italic": false,
+                "textColor": {
+                    "c": 100,
+                    "m": 50,
+                    "y": 0,
+                    "k": 0,
+                    "a": 1.0
+                }
+            },
+            {
+                "comment": "SimHei 斜体",
+                "x": 120,
+                "y": 2452,
+                "z": 19,
+                "content": "黑体斜体 SimHei Italic：欲望千里目，更上一层楼",
+                "fontFamily": "SimHei",
+                "fontSize": 36,
+                "bold": false,
+                "italic": true,
+                "textColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 100,
+                    "a": 1.0
+                }
+            },
+            {
+                "comment": "SimHei 粗斜体",
+                "x": 120,
+                "y": 2565,
+                "z": 20,
+                "content": "黑体粗斜体 SimHei BoldItalic：轻舟已过万重山",
+                "fontFamily": "SimHei",
+                "fontSize": 36,
+                "bold": true,
+                "italic": true,
+                "textColor": {
+                    "c": 0,
+                    "m": 100,
+                    "y": 0,
+                    "k": 0,
+                    "a": 1.0
+                }
+            },
+            {
+                "comment": "KaiTi 粗体",
+                "x": 120,
+                "y": 2677,
+                "z": 21,
+                "content": "楷体粗体 KaiTi Bold：两岸猿声啼不住",
+                "fontFamily": "KaiTi",
+                "fontSize": 36,
+                "bold": true,
+                "italic": false,
+                "textColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 100,
+                    "a": 1.0
+                }
+            },
+            {
+                "comment": "KaiTi 斜体",
+                "x": 120,
+                "y": 2790,
+                "z": 22,
+                "content": "楷体斜体 KaiTi Italic：床前明月光，疑是地上霜",
+                "fontFamily": "KaiTi",
+                "fontSize": 36,
+                "bold": false,
+                "italic": true,
+                "textColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 100,
+                    "a": 1.0
+                }
+            },
+            {
+                "comment": "KaiTi 粗斜体",
+                "x": 120,
+                "y": 2902,
+                "z": 23,
+                "content": "楷体粗斜体 KaiTi BoldItalic：举头望明月，低头思故乡",
+                "fontFamily": "KaiTi",
+                "fontSize": 36,
+                "bold": true,
+                "italic": true,
+                "textColor": {
+                    "c": 0,
+                    "m": 100,
+                    "y": 0,
+                    "k": 0,
+                    "a": 1.0
+                }
+            },
+            {
+                "comment": "Microsoft YaHei 纯粗体",
+                "x": 120,
+                "y": 3015,
+                "z": 24,
+                "content": "微软雅黑粗体 YaHei Bold：轻舟已过万重山",
+                "fontFamily": "Microsoft YaHei",
+                "fontSize": 36,
+                "bold": true,
+                "italic": false,
+                "textColor": {
+                    "c": 100,
+                    "m": 0,
+                    "y": 0,
+                    "k": 0,
+                    "a": 1.0
+                }
+            },
+            {
+                "comment": "Microsoft YaHei 斜体",
+                "x": 120,
+                "y": 3127,
+                "z": 25,
+                "content": "微软雅黑斜体 YaHei Italic：白日依山尽，黄河入海流",
+                "fontFamily": "Microsoft YaHei",
+                "fontSize": 36,
+                "bold": false,
+                "italic": true,
+                "textColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 100,
+                    "a": 1.0
+                }
+            },
+            {
+                "comment": "Microsoft YaHei 粗斜体 (还原)",
+                "x": 120,
+                "y": 3240,
+                "z": 26,
+                "content": "微软雅黑粗斜体 YaHei BoldItalic：两岸猿声啼不住",
+                "fontFamily": "Microsoft YaHei",
+                "fontSize": 36,
+                "bold": true,
+                "italic": true,
+                "textColor": {
+                    "c": 0,
+                    "m": 100,
+                    "y": 0,
+                    "k": 0,
+                    "a": 1.0
+                }
+            },
+            {
+                "comment": "═══ 分隔线 ════════════════════════════════════════════",
+                "x": 60,
+                "y": 3435,
+                "z": 27,
+                "content": "═══ 更多字体 & 英文字体对比 ════════════════════════════════════════════",
+                "fontFamily": "SimHei",
+                "fontSize": 22,
+                "bold": true,
+                "italic": false,
+                "textColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 40,
+                    "a": 1.0
+                }
+            },
+            {
+                "comment": "FangSong 仿宋 Regular",
+                "x": 120,
+                "y": 3540,
+                "z": 28,
+                "content": "仿宋 FangSong Regular：春眠不觉晓，处处闻啼鸟",
+                "fontFamily": "FangSong",
+                "fontSize": 36,
+                "bold": false,
+                "italic": false,
+                "textColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 100,
+                    "a": 1.0
+                }
+            },
+            {
+                "comment": "STKaiti 华文楷体 Regular",
+                "x": 120,
+                "y": 3652,
+                "z": 29,
+                "content": "华文楷体 STKaiti Regular：欲穷千里目，更上一层楼",
+                "fontFamily": "STKaiti",
+                "fontSize": 36,
+                "bold": false,
+                "italic": false,
+                "textColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 100,
+                    "a": 1.0
+                }
+            },
+            {
+                "comment": "DFKai-SB Regular",
+                "x": 120,
+                "y": 3765,
+                "z": 30,
+                "content": "标楷体 DFKai-SB Regular：白日依山尽，黄河入海流",
+                "fontFamily": "DFKai-SB",
+                "fontSize": 36,
+                "bold": false,
+                "italic": false,
+                "textColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 100,
+                    "a": 1.0
+                }
+            },
+            {
+                "comment": "Arial Regular 英文基准",
+                "x": 120,
+                "y": 3892,
+                "z": 31,
+                "content": "Arial Regular — The quick brown fox jumps over the lazy dog.",
+                "fontFamily": "Arial",
+                "fontSize": 28,
+                "bold": false,
+                "italic": false,
+                "textColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 100,
+                    "a": 1.0
+                }
+            },
+            {
+                "comment": "Arial Bold",
+                "x": 120,
+                "y": 3997,
+                "z": 32,
+                "content": "Arial Bold — The quick brown fox jumps over the lazy dog.",
+                "fontFamily": "Arial",
+                "fontSize": 28,
+                "bold": true,
+                "italic": false,
+                "textColor": {
+                    "c": 100,
+                    "m": 0,
+                    "y": 0,
+                    "k": 0,
+                    "a": 1.0
+                }
+            },
+            {
+                "comment": "Arial Italic",
+                "x": 120,
+                "y": 4102,
+                "z": 33,
+                "content": "Arial Italic — The quick brown fox jumps over the lazy dog.",
+                "fontFamily": "Arial",
+                "fontSize": 28,
+                "bold": false,
+                "italic": true,
+                "textColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 100,
+                    "a": 1.0
+                }
+            },
+            {
+                "comment": "Arial Bold Italic",
+                "x": 120,
+                "y": 4207,
+                "z": 34,
+                "content": "Arial BoldItalic — The quick brown fox jumps over the lazy dog.",
+                "fontFamily": "Arial",
+                "fontSize": 28,
+                "bold": true,
+                "italic": true,
+                "textColor": {
+                    "c": 0,
+                    "m": 100,
+                    "y": 0,
+                    "k": 0,
+                    "a": 1.0
+                }
+            },
+            {
+                "comment": "Arial 中英混合",
+                "x": 120,
+                "y": 4312,
+                "z": 35,
+                "content": "Arial CJK: 春眠不觉晓处处闻啼鸟 — Hello World 你好世界 こんにちは",
+                "fontFamily": "Arial",
+                "fontSize": 28,
+                "bold": false,
+                "italic": false,
+                "textColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 100,
+                    "a": 1.0
+                }
+            },
+            {
+                "comment": "Times New Roman Regular",
+                "x": 120,
+                "y": 4432,
+                "z": 36,
+                "content": "Times New Roman — The quick brown fox jumps over the lazy dog.",
+                "fontFamily": "Times New Roman",
+                "fontSize": 28,
+                "bold": false,
+                "italic": false,
+                "textColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 100,
+                    "a": 1.0
+                }
+            },
+            {
+                "comment": "Times New Roman Bold Italic",
+                "x": 120,
+                "y": 4537,
+                "z": 37,
+                "content": "Times New Roman BoldItalic  — The quick brown fox jumps over the lazy dog.",
+                "fontFamily": "Times New Roman",
+                "fontSize": 28,
+                "bold": true,
+                "italic": true,
+                "textColor": {
+                    "c": 0,
+                    "m": 100,
+                    "y": 0,
+                    "k": 0,
+                    "a": 1.0
+                }
+            },
+            {
+                "comment": "═══ 分隔线 ════════════════════════════════════════════",
+                "x": 60,
+                "y": 4732,
+                "z": 38,
+                "content": "═══ 边界测试：小字号 / 多字号 / 长文本 / 负旋转 ════════════════════════════",
+                "fontFamily": "SimHei",
+                "fontSize": 22,
+                "bold": true,
+                "italic": false,
+                "textColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 40,
+                    "a": 1.0
+                }
+            },
+            {
+                "comment": "字号梯度 SimSun",
+                "x": 120,
+                "y": 4860,
+                "z": 39,
+                "content": "SimSun 字号梯度：8pt 10pt 12pt 14pt 18pt 24pt 30pt 36pt 48pt 64pt 100pt",
+                "fontFamily": "SimSun",
+                "fontSize": 8,
+                "bold": false,
+                "italic": false,
+                "textColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 100,
+                    "a": 1.0
+                }
+            },
+            {
+                "comment": "字号梯度 10pt",
+                "x": 120,
+                "y": 4935,
+                "z": 40,
+                "content": "SimSun 字号梯度：8pt 10pt 12pt 14pt 18pt 24pt 30pt 36pt 48pt 64pt 100pt",
+                "fontFamily": "SimSun",
+                "fontSize": 10,
+                "bold": false,
+                "italic": false,
+                "textColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 100,
+                    "a": 1.0
+                }
+            },
+            {
+                "comment": "字号梯度 14pt",
+                "x": 120,
+                "y": 5010,
+                "z": 41,
+                "content": "SimSun 字号梯度：8pt 10pt 12pt 14pt 18pt 24pt 30pt 36pt 48pt 64pt 100pt",
+                "fontFamily": "SimSun",
+                "fontSize": 14,
+                "bold": false,
+                "italic": false,
+                "textColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 100,
+                    "a": 1.0
+                }
+            },
+            {
+                "comment": "字号梯度 18pt",
+                "x": 120,
+                "y": 5092,
+                "z": 42,
+                "content": "SimSun 字号梯度：8pt 10pt 12pt 14pt 18pt 24pt 30pt 36pt 48pt 64pt 100pt",
+                "fontFamily": "SimSun",
+                "fontSize": 18,
+                "bold": false,
+                "italic": false,
+                "textColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 100,
+                    "a": 1.0
+                }
+            },
+            {
+                "comment": "字号梯度 30pt",
+                "x": 120,
+                "y": 5190,
+                "z": 43,
+                "content": "SimSun 字号梯度：8pt 10pt 12pt 14pt 18pt 24pt 30pt 36pt 48pt 64pt 100pt",
+                "fontFamily": "SimSun",
+                "fontSize": 30,
+                "bold": false,
+                "italic": false,
+                "textColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 100,
+                    "a": 1.0
+                }
+            },
+            {
+                "comment": "字号梯度 64pt",
+                "x": 120,
+                "y": 5325,
+                "z": 44,
+                "content": "SimSun 字号梯度：8pt 10pt 12pt 14pt 18pt 24pt 30pt 36pt 48pt 64pt 100pt",
+                "fontFamily": "SimSun",
+                "fontSize": 64,
+                "bold": true,
+                "italic": false,
+                "textColor": {
+                    "c": 100,
+                    "m": 0,
+                    "y": 0,
+                    "k": 0,
+                    "a": 1.0
+                }
+            },
+            {
+                "comment": "长文本 SimSun 28px",
+                "x": 120,
+                "y": 5475,
+                "z": 45,
+                "content": "长文本：天地有正气，杂然赋流形。下则为河岳，上则为日星。于人曰浩然，沛乎塞苍冥。皇路当清夷，含和吐明庭。时穷节乃见，一一垂丹青。",
+                "fontFamily": "SimSun",
+                "fontSize": 28,
+                "bold": false,
+                "italic": false,
+                "textColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 100,
+                    "a": 1.0
+                }
+            },
+            {
+                "comment": "长文本 SimSun Bold 28px",
+                "x": 120,
+                "y": 5587,
+                "z": 46,
+                "content": "长文本Bold：天地有正气，杂然赋流形。下则为河岳，上则为日星。于人曰浩然，沛乎塞苍冥。皇路当清夷，含和吐明庭。时穷节乃见，一一垂丹青。",
+                "fontFamily": "SimSun",
+                "fontSize": 28,
+                "bold": true,
+                "italic": false,
+                "textColor": {
+                    "c": 100,
+                    "m": 0,
+                    "y": 0,
+                    "k": 0,
+                    "a": 1.0
+                }
+            },
+            {
+                "comment": "长文本 Microsoft YaHei 28px",
+                "x": 120,
+                "y": 5700,
+                "z": 47,
+                "content": "长文本YaHei：天地有正气，杂然赋流形。下则为河岳，上则为日星。于人曰浩然，沛乎塞苍冥。皇路当清夷，含和吐明庭。时穷节乃见，一一垂丹青。",
+                "fontFamily": "Microsoft YaHei",
+                "fontSize": 28,
+                "bold": false,
+                "italic": false,
+                "textColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 100,
+                    "a": 1.0
+                }
+            },
+            {
+                "comment": "负旋转 -10° SimSun",
+                "x": 2000,
+                "y": 6000,
+                "z": 48,
+                "content": "SimSun 旋转 -10°：飞流直下三千尺",
+                "fontFamily": "SimSun",
+                "fontSize": 36,
+                "bold": false,
+                "italic": false,
+                "textColor": {
+                    "c": 100,
+                    "m": 0,
+                    "y": 0,
+                    "k": 0,
+                    "a": 1.0
+                }
+            },
+            {
+                "comment": "负旋转 -10° SimSun Bold",
+                "x": 2000,
+                "y": 6150,
+                "z": 49,
+                "content": "SimSun Bold 旋转 -10°：疑是银河落九天",
+                "fontFamily": "SimSun",
+                "fontSize": 36,
+                "bold": true,
+                "italic": false,
+                "textColor": {
+                    "c": 0,
+                    "m": 100,
+                    "y": 0,
+                    "k": 0,
+                    "a": 1.0
+                }
+            },
+            {
+                "comment": "旋转 +15° SimSun Italic",
+                "x": 120,
+                "y": 6450,
+                "z": 50,
+                "content": "SimSun Italic 旋转 +15°：大漠孤烟直，长河落日圆",
+                "fontFamily": "SimSun",
+                "fontSize": 36,
+                "bold": false,
+                "italic": true,
+                "textColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 100,
+                    "k": 0,
+                    "a": 1.0
+                }
+            },
+            {
+                "comment": "透明度测试 SimSun",
+                "x": 120,
+                "y": 6750,
+                "z": 51,
+                "content": "50% 透明度 SimSun：人闲桂花落，夜静春山空",
+                "fontFamily": "SimSun",
+                "fontSize": 36,
+                "bold": false,
+                "italic": false,
+                "textColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 100,
+                    "a": 0.5
+                }
+            }
+        ]
+    }
+}

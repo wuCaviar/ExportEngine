@@ -1,0 +1,169 @@
+{
+    "canvas": {
+        "width": 9373,
+        "height": 303730,
+        "dpiX": 150,
+        "dpiY": 150,
+        "background": {
+            "c": 0,
+            "m": 0,
+            "y": 0,
+            "k": 0,
+            "a": 1.0
+        },
+        "images": [
+            {
+                "filePath": "/Volumes/Caviar/tif图片/1001.M.tif",
+                "x": 0,
+                "y": 0,
+                "width": 9373,
+                "height": 13588,
+                "z": 1
+            },
+            {
+                "filePath": "/Volumes/Caviar/tif图片/1002.M.tif",
+                "x": 0,
+                "y": 13588,
+                "width": 9373,
+                "height": 13588,
+                "z": 2
+            },
+            {
+                "filePath": "/Volumes/Caviar/tif图片/1003.L.tif",
+                "x": 0,
+                "y": 27176,
+                "width": 9369,
+                "height": 14259,
+                "z": 3
+            },
+            {
+                "filePath": "/Volumes/Caviar/tif图片/1004.XL.tif",
+                "x": 0,
+                "y": 41435,
+                "width": 9370,
+                "height": 14830,
+                "z": 4
+            },
+            {
+                "filePath": "/Volumes/Caviar/tif图片/1005.XL.tif",
+                "x": 0,
+                "y": 56265,
+                "width": 9370,
+                "height": 14830,
+                "z": 5
+            },
+            {
+                "filePath": "/Volumes/Caviar/tif图片/1006.XL.tif",
+                "x": 0,
+                "y": 71095,
+                "width": 9370,
+                "height": 14830,
+                "z": 6
+            },
+            {
+                "filePath": "/Volumes/Caviar/tif图片/1007.2XL.tif",
+                "x": 0,
+                "y": 85925,
+                "width": 9366,
+                "height": 15431,
+                "z": 7
+            },
+            {
+                "filePath": "/Volumes/Caviar/tif图片/1008.3XL.tif",
+                "x": 0,
+                "y": 101356,
+                "width": 9369,
+                "height": 16098,
+                "z": 8
+            },
+            {
+                "filePath": "/Volumes/Caviar/tif图片/1009.3XL.tif",
+                "x": 0,
+                "y": 117454,
+                "width": 9369,
+                "height": 16098,
+                "z": 9
+            },
+            {
+                "filePath": "/Volumes/Caviar/tif图片/1010.3XL.tif",
+                "x": 0,
+                "y": 133552,
+                "width": 9369,
+                "height": 16098,
+                "z": 10
+            },
+            {
+                "filePath": "/Volumes/Caviar/tif图片/1011.3XL.tif",
+                "x": 0,
+                "y": 149650,
+                "width": 9369,
+                "height": 16098,
+                "z": 11
+            },
+            {
+                "filePath": "/Volumes/Caviar/tif图片/1012.3XL.tif",
+                "x": 0,
+                "y": 165748,
+                "width": 9369,
+                "height": 16098,
+                "z": 12
+            },
+            {
+                "filePath": "/Volumes/Caviar/tif图片/1013.3XL.tif",
+                "x": 0,
+                "y": 181846,
+                "width": 9369,
+                "height": 16098,
+                "z": 13
+            },
+            {
+                "filePath": "/Volumes/Caviar/tif图片/1014.5XL.tif",
+                "x": 0,
+                "y": 197944,
+                "width": 9366,
+                "height": 17631,
+                "z": 14
+            },
+            {
+                "filePath": "/Volumes/Caviar/tif图片/1015.5XL.tif",
+                "x": 0,
+                "y": 215575,
+                "width": 9366,
+                "height": 17631,
+                "z": 15
+            },
+            {
+                "filePath": "/Volumes/Caviar/tif图片/1016.5XL.tif",
+                "x": 0,
+                "y": 233206,
+                "width": 9366,
+                "height": 17631,
+                "z": 16
+            },
+            {
+                "filePath": "/Volumes/Caviar/tif图片/1017.5XL.tif",
+                "x": 0,
+                "y": 250837,
+                "width": 9366,
+                "height": 17631,
+                "z": 17
+            },
+            {
+                "filePath": "/Volumes/Caviar/tif图片/1018.5XL.tif",
+                "x": 0,
+                "y": 268468,
+                "width": 9366,
+                "height": 17631,
+                "z": 18
+            },
+            {
+                "filePath": "/Volumes/Caviar/tif图片/1019.5XL.tif",
+                "x": 0,
+                "y": 286099,
+                "width": 9366,
+                "height": 17631,
+                "z": 19
+            }
+        ]
+    }
+}

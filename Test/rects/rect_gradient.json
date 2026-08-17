@@ -1,0 +1,233 @@
+{
+    "canvas": {
+        "width": 2500,
+        "height": 1500,
+        "dpiX": 600,
+        "dpiY": 600,
+        "background": {
+            "c": 0,
+            "m": 0,
+            "y": 0,
+            "k": 5,
+            "a": 1.0
+        },
+        "rects": [
+            {
+                "x": 50,
+                "y": 50,
+                "width": 600,
+                "height": 400,
+                "z": 1,
+                "strokeColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 100,
+                    "a": 1.0
+                },
+                "strokeWidth": 2,
+                "cornerRadius": 20,
+                "lineStyle": "solid",
+                "gradient": {
+                    "type": "linear",
+                    "x1": 0,
+                    "y1": 0,
+                    "x2": 1,
+                    "y2": 0,
+                    "stops": [
+                        {
+                            "offset": 0.0,
+                            "color": {
+                                "c": 0,
+                                "m": 100,
+                                "y": 100,
+                                "k": 0,
+                                "a": 1.0
+                            }
+                        },
+                        {
+                            "offset": 0.5,
+                            "color": {
+                                "c": 0,
+                                "m": 0,
+                                "y": 100,
+                                "k": 0,
+                                "a": 1.0
+                            }
+                        },
+                        {
+                            "offset": 1.0,
+                            "color": {
+                                "c": 100,
+                                "m": 0,
+                                "y": 0,
+                                "k": 0,
+                                "a": 1.0
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                "x": 700,
+                "y": 50,
+                "width": 600,
+                "height": 400,
+                "z": 2,
+                "strokeWidth": 0,
+                "cornerRadius": 20,
+                "gradient": {
+                    "type": "linear",
+                    "x1": 0,
+                    "y1": 0,
+                    "x2": 0,
+                    "y2": 1,
+                    "stops": [
+                        {
+                            "offset": 0.0,
+                            "color": {
+                                "c": 100,
+                                "m": 0,
+                                "y": 0,
+                                "k": 0,
+                                "a": 1.0
+                            }
+                        },
+                        {
+                            "offset": 1.0,
+                            "color": {
+                                "c": 0,
+                                "m": 0,
+                                "y": 100,
+                                "k": 0,
+                                "a": 1.0
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                "x": 1350,
+                "y": 50,
+                "width": 600,
+                "height": 400,
+                "z": 3,
+                "strokeWidth": 0,
+                "cornerRadius": 0,
+                "gradient": {
+                    "type": "radial",
+                    "cx": 0.5,
+                    "cy": 0.5,
+                    "r": 0.7,
+                    "stops": [
+                        {
+                            "offset": 0.0,
+                            "color": {
+                                "c": 0,
+                                "m": 0,
+                                "y": 0,
+                                "k": 0,
+                                "a": 1.0
+                            }
+                        },
+                        {
+                            "offset": 0.5,
+                            "color": {
+                                "c": 50,
+                                "m": 0,
+                                "y": 50,
+                                "k": 0,
+                                "a": 1.0
+                            }
+                        },
+                        {
+                            "offset": 1.0,
+                            "color": {
+                                "c": 100,
+                                "m": 100,
+                                "y": 0,
+                                "k": 0,
+                                "a": 1.0
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                "x": 50,
+                "y": 500,
+                "width": 600,
+                "height": 400,
+                "z": 4,
+                "strokeColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 100,
+                    "a": 1.0
+                },
+                "strokeWidth": 2,
+                "cornerRadius": 0,
+                "lineStyle": "solid",
+                "gradient": {
+                    "type": "conic",
+                    "cx": 0.5,
+                    "cy": 0.5,
+                    "startAngle": 0,
+                    "stops": [
+                        {
+                            "offset": 0.0,
+                            "color": {
+                                "c": 100,
+                                "m": 0,
+                                "y": 0,
+                                "k": 0,
+                                "a": 1.0
+                            }
+                        },
+                        {
+                            "offset": 0.25,
+                            "color": {
+                                "c": 0,
+                                "m": 100,
+                                "y": 0,
+                                "k": 0,
+                                "a": 1.0
+                            }
+                        },
+                        {
+                            "offset": 0.5,
+                            "color": {
+                                "c": 0,
+                                "m": 0,
+                                "y": 100,
+                                "k": 0,
+                                "a": 1.0
+                            }
+                        },
+                        {
+                            "offset": 0.75,
+                            "color": {
+                                "c": 0,
+                                "m": 0,
+                                "y": 0,
+                                "k": 100,
+                                "a": 1.0
+                            }
+                        },
+                        {
+                            "offset": 1.0,
+                            "color": {
+                                "c": 100,
+                                "m": 0,
+                                "y": 0,
+                                "k": 0,
+                                "a": 1.0
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}

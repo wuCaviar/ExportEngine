@@ -1,0 +1,169 @@
+{
+    "canvas": {
+        "width": 22495,
+        "height": 2429840,
+        "dpiX": 360,
+        "dpiY": 1200,
+        "background": {
+            "c": 0,
+            "m": 0,
+            "y": 0,
+            "k": 0,
+            "a": 1.0
+        },
+        "images": [
+            {
+                "filePath": "D:/WorkSpace/tifTest/1001.M.tif",
+                "x": 0,
+                "y": 0,
+                "width": 22495,
+                "height": 108704,
+                "z": 1
+            },
+            {
+                "filePath": "D:/WorkSpace/tifTest/1002.M.tif",
+                "x": 0,
+                "y": 108704,
+                "width": 22495,
+                "height": 108704,
+                "z": 2
+            },
+            {
+                "filePath": "D:/WorkSpace/tifTest/1003.L.tif",
+                "x": 0,
+                "y": 217408,
+                "width": 22486,
+                "height": 114072,
+                "z": 3
+            },
+            {
+                "filePath": "D:/WorkSpace/tifTest/1004.XL.tif",
+                "x": 0,
+                "y": 331480,
+                "width": 22488,
+                "height": 118640,
+                "z": 4
+            },
+            {
+                "filePath": "D:/WorkSpace/tifTest/1005.XL.tif",
+                "x": 0,
+                "y": 450120,
+                "width": 22488,
+                "height": 118640,
+                "z": 5
+            },
+            {
+                "filePath": "D:/WorkSpace/tifTest/1006.XL.tif",
+                "x": 0,
+                "y": 568760,
+                "width": 22488,
+                "height": 118640,
+                "z": 6
+            },
+            {
+                "filePath": "D:/WorkSpace/tifTest/1007.2XL.tif",
+                "x": 0,
+                "y": 687400,
+                "width": 22478,
+                "height": 123448,
+                "z": 7
+            },
+            {
+                "filePath": "D:/WorkSpace/tifTest/1008.3XL.tif",
+                "x": 0,
+                "y": 810848,
+                "width": 22486,
+                "height": 128784,
+                "z": 8
+            },
+            {
+                "filePath": "D:/WorkSpace/tifTest/1009.3XL.tif",
+                "x": 0,
+                "y": 939632,
+                "width": 22486,
+                "height": 128784,
+                "z": 9
+            },
+            {
+                "filePath": "D:/WorkSpace/tifTest/1010.3XL.tif",
+                "x": 0,
+                "y": 1068416,
+                "width": 22486,
+                "height": 128784,
+                "z": 10
+            },
+            {
+                "filePath": "D:/WorkSpace/tifTest/1011.3XL.tif",
+                "x": 0,
+                "y": 1197200,
+                "width": 22486,
+                "height": 128784,
+                "z": 11
+            },
+            {
+                "filePath": "D:/WorkSpace/tifTest/1012.3XL.tif",
+                "x": 0,
+                "y": 1325984,
+                "width": 22486,
+                "height": 128784,
+                "z": 12
+            },
+            {
+                "filePath": "D:/WorkSpace/tifTest/1013.3XL.tif",
+                "x": 0,
+                "y": 1454768,
+                "width": 22486,
+                "height": 128784,
+                "z": 13
+            },
+            {
+                "filePath": "D:/WorkSpace/tifTest/1014.5XL.tif",
+                "x": 0,
+                "y": 1583552,
+                "width": 22478,
+                "height": 141048,
+                "z": 14
+            },
+            {
+                "filePath": "D:/WorkSpace/tifTest/1015.5XL.tif",
+                "x": 0,
+                "y": 1724600,
+                "width": 22478,
+                "height": 141048,
+                "z": 15
+            },
+            {
+                "filePath": "D:/WorkSpace/tifTest/1016.5XL.tif",
+                "x": 0,
+                "y": 1865648,
+                "width": 22478,
+                "height": 141048,
+                "z": 16
+            },
+            {
+                "filePath": "D:/WorkSpace/tifTest/1017.5XL.tif",
+                "x": 0,
+                "y": 2006696,
+                "width": 22478,
+                "height": 141048,
+                "z": 17
+            },
+            {
+                "filePath": "D:/WorkSpace/tifTest/1018.5XL.tif",
+                "x": 0,
+                "y": 2147744,
+                "width": 22478,
+                "height": 141048,
+                "z": 18
+            },
+            {
+                "filePath": "D:/WorkSpace/tifTest/1019.5XL.tif",
+                "x": 0,
+                "y": 2288792,
+                "width": 22478,
+                "height": 141048,
+                "z": 19
+            }
+        ]
+    }
+}

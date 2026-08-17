@@ -1,0 +1,179 @@
+{
+    "canvas": {
+        "width": 3000,
+        "height": 1600,
+        "dpiX": 150,
+        "dpiY": 150,
+        "background": {
+            "c": 0,
+            "m": 0,
+            "y": 0,
+            "k": 5,
+            "a": 1.0
+        },
+        "texts": [
+            {
+                "comment": "Arial 36px — regular",
+                "x": 100,
+                "y": 80,
+                "z": 1,
+                "content": "Hello World — Arial 36px",
+                "fontFamily": "Arial",
+                "fontSize": 36,
+                "bold": false,
+                "italic": false,
+                "textColor": {
+                    "c": 100,
+                    "m": 0,
+                    "y": 0,
+                    "k": 0,
+                    "a": 1.0
+                }
+            },
+            {
+                "comment": "Arial 36px — bold",
+                "x": 100,
+                "y": 140,
+                "z": 2,
+                "content": "Bold Text — Arial Bold 36px",
+                "fontFamily": "Arial",
+                "fontSize": 36,
+                "bold": true,
+                "italic": false,
+                "textColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 100,
+                    "a": 1.0
+                }
+            },
+            {
+                "comment": "Arial 36px — italic",
+                "x": 100,
+                "y": 200,
+                "z": 3,
+                "content": "Italic Text — Arial Italic 36px",
+                "fontFamily": "Arial",
+                "fontSize": 36,
+                "bold": false,
+                "italic": true,
+                "textColor": {
+                    "c": 0,
+                    "m": 100,
+                    "y": 0,
+                    "k": 0,
+                    "a": 1.0
+                }
+            },
+            {
+                "comment": "Arial 36px — bold italic",
+                "x": 100,
+                "y": 260,
+                "z": 4,
+                "content": "Bold Italic — Arial BoldItalic 36px",
+                "fontFamily": "Arial",
+                "fontSize": 36,
+                "bold": true,
+                "italic": true,
+                "textColor": {
+                    "c": 0,
+                    "m": 100,
+                    "y": 100,
+                    "k": 0,
+                    "a": 1.0
+                }
+            },
+            {
+                "comment": "Arial 24px — regular",
+                "x": 100,
+                "y": 350,
+                "z": 5,
+                "content": "Small text Arial 24px — The quick brown fox jumps over the lazy dog",
+                "fontFamily": "Arial",
+                "fontSize": 24,
+                "bold": false,
+                "italic": false,
+                "textColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 100,
+                    "a": 1.0
+                }
+            },
+            {
+                "comment": "Arial 48px — CMYK cyan",
+                "x": 100,
+                "y": 540,
+                "z": 6,
+                "content": "Large Title 48px",
+                "fontFamily": "Arial",
+                "fontSize": 48,
+                "bold": true,
+                "italic": false,
+                "textColor": {
+                    "c": 100,
+                    "m": 0,
+                    "y": 0,
+                    "k": 0,
+                    "a": 1.0
+                }
+            },
+            {
+                "comment": "Arial 32px — upright (rotation unsupported)",
+                "x": 100,
+                "y": 560,
+                "z": 7,
+                "content": "Rotated 10° — still legible",
+                "fontFamily": "Arial",
+                "fontSize": 32,
+                "bold": false,
+                "italic": false,
+                "textColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 100,
+                    "a": 1.0
+                }
+            },
+            {
+                "comment": "RGBA color text",
+                "x": 100,
+                "y": 660,
+                "z": 8,
+                "content": "RGBA Color — red text",
+                "fontFamily": "Arial",
+                "fontSize": 36,
+                "bold": false,
+                "italic": false,
+                "textColor": {
+                    "a": 1.0,
+                    "c": 0.0,
+                    "m": 100.0,
+                    "y": 100.0,
+                    "k": 0.0
+                }
+            },
+            {
+                "comment": "Long line — Arial 18px",
+                "x": 100,
+                "y": 740,
+                "z": 9,
+                "content": "ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz 0123456789 !@#$%^&*()",
+                "fontFamily": "Arial",
+                "fontSize": 18,
+                "bold": false,
+                "italic": false,
+                "textColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 90,
+                    "a": 0.7
+                }
+            }
+        ]
+    }
+}

@@ -1,0 +1,41 @@
+{
+    "canvas": {
+        "width": 22495,
+        "height": 331480,
+        "dpiX": 360,
+        "dpiY": 1200,
+        "background": {
+            "c": 0,
+            "m": 0,
+            "y": 0,
+            "k": 0,
+            "a": 1.0
+        },
+        "images": [
+            {
+                "filePath": "D:/WorkSpace/tifTest/1001.M.tif",
+                "x": 0,
+                "y": 0,
+                "width": 22495,
+                "height": 108704,
+                "z": 1
+            },
+            {
+                "filePath": "D:/WorkSpace/tifTest/1002.M.tif",
+                "x": 0,
+                "y": 108704,
+                "width": 22495,
+                "height": 108704,
+                "z": 2
+            },
+            {
+                "filePath": "D:/WorkSpace/tifTest/1003.L.tif",
+                "x": 0,
+                "y": 217408,
+                "width": 22486,
+                "height": 114072,
+                "z": 3
+            }
+        ]
+    }
+}

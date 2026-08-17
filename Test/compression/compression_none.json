@@ -1,0 +1,130 @@
+{
+    "canvas": {
+        "width": 800,
+        "height": 600,
+        "dpiX": 72,
+        "dpiY": 72,
+        "unit": "px",
+        "background": {
+            "c": 0,
+            "m": 0,
+            "y": 0,
+            "k": 0,
+            "a": 1.0
+        },
+        "rects": [
+            {
+                "x": 50,
+                "y": 50,
+                "width": 300,
+                "height": 200,
+                "z": 0,
+                "fillColor": {
+                    "c": 80,
+                    "m": 20,
+                    "y": 0,
+                    "k": 10,
+                    "a": 1.0
+                },
+                "lineStyle": "solid",
+                "strokeColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 100,
+                    "a": 1.0
+                },
+                "strokeWidth": 2
+            },
+            {
+                "x": 400,
+                "y": 50,
+                "width": 350,
+                "height": 250,
+                "z": 0,
+                "fillColor": {
+                    "c": 0,
+                    "m": 70,
+                    "y": 90,
+                    "k": 0,
+                    "a": 1.0
+                },
+                "lineStyle": "solid",
+                "strokeColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 100,
+                    "a": 1.0
+                },
+                "strokeWidth": 2
+            },
+            {
+                "x": 50,
+                "y": 300,
+                "width": 700,
+                "height": 250,
+                "z": 0,
+                "fillColor": {
+                    "c": 50,
+                    "m": 0,
+                    "y": 30,
+                    "k": 20,
+                    "a": 1.0
+                },
+                "lineStyle": "solid",
+                "strokeColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 100,
+                    "a": 1.0
+                },
+                "strokeWidth": 2
+            }
+        ],
+        "circles": [
+            {
+                "cx": 400,
+                "cy": 300,
+                "radiusX": 80,
+                "radiusY": 80,
+                "z": 1,
+                "fillColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 0,
+                    "a": 1.0
+                },
+                "strokeColor": {
+                    "c": 0,
+                    "m": 100,
+                    "y": 100,
+                    "k": 0,
+                    "a": 1.0
+                },
+                "strokeWidth": 3,
+                "lineStyle": "solid"
+            }
+        ],
+        "texts": [
+            {
+                "x": 400,
+                "y": 180,
+                "content": "Compression: NONE",
+                "fontFamily": "Arial",
+                "fontSize": 36,
+                "bold": true,
+                "z": 2,
+                "textColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 100,
+                    "a": 1.0
+                }
+            }
+        ]
+    }
+}

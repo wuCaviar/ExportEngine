@@ -1,0 +1,108 @@
+{
+    "canvas": {
+        "unit": "mm",
+        "width": 210,
+        "height": 297,
+        "dpiX": 300,
+        "dpiY": 300,
+        "background": {
+            "c": 0,
+            "m": 0,
+            "y": 0,
+            "k": 5,
+            "a": 1.0
+        },
+        "rects": [
+            {
+                "x": 10,
+                "y": 10,
+                "width": 50,
+                "height": 30,
+                "z": 1,
+                "fillColor": {
+                    "c": 0,
+                    "m": 100,
+                    "y": 100,
+                    "k": 0,
+                    "a": 1.0
+                },
+                "strokeColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 100,
+                    "a": 1.0
+                },
+                "strokeWidth": 0.5,
+                "cornerRadius": 0,
+                "lineStyle": "solid"
+            },
+            {
+                "x": 10,
+                "y": 50,
+                "width": 50,
+                "height": 30,
+                "z": 2,
+                "fillColor": {
+                    "c": 100,
+                    "m": 0,
+                    "y": 0,
+                    "k": 0,
+                    "a": 0.8
+                },
+                "strokeColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 80,
+                    "a": 1.0
+                },
+                "strokeWidth": 0.3,
+                "cornerRadius": 2,
+                "lineStyle": "solid"
+            }
+        ],
+        "circles": [
+            {
+                "cx": 100,
+                "cy": 30,
+                "radiusX": 15,
+                "z": 3,
+                "fillColor": {
+                    "c": 0,
+                    "m": 60,
+                    "y": 100,
+                    "k": 0,
+                    "a": 1.0
+                },
+                "strokeColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 100,
+                    "a": 1.0
+                },
+                "strokeWidth": 0.3,
+                "lineStyle": "solid"
+            }
+        ],
+        "lines": [
+            {
+                "x1": 5,
+                "y1": 120,
+                "x2": 100,
+                "y2": 120,
+                "z": 4,
+                "strokeColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 50,
+                    "a": 1.0
+                },
+                "strokeWidth": 0.5,
+                "lineStyle": "dashed"
+            }
+        ]
+    }
+}

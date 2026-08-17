@@ -1,0 +1,132 @@
+{
+    "canvas": {
+        "width": 2000,
+        "height": 1500,
+        "dpiX": 150,
+        "dpiY": 150,
+        "background": {
+            "c": 0,
+            "m": 0,
+            "y": 0,
+            "k": 5,
+            "a": 1.0
+        },
+        "circles": [
+            {
+                "cx": 200,
+                "cy": 200,
+                "radiusX": 150,
+                "radiusY": 150,
+                "z": 1,
+                "fillColor": {
+                    "c": 0,
+                    "m": 100,
+                    "y": 100,
+                    "k": 0,
+                    "a": 1.0
+                },
+                "strokeColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 100,
+                    "a": 1.0
+                },
+                "strokeWidth": 2,
+                "lineStyle": "solid"
+            },
+            {
+                "cx": 500,
+                "cy": 200,
+                "radiusX": 150,
+                "radiusY": 100,
+                "z": 2,
+                "fillColor": {
+                    "c": 100,
+                    "m": 0,
+                    "y": 0,
+                    "k": 0,
+                    "a": 0.8
+                },
+                "strokeColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 100,
+                    "a": 1.0
+                },
+                "strokeWidth": 3,
+                "lineStyle": "solid"
+            },
+            {
+                "cx": 800,
+                "cy": 200,
+                "radiusX": 100,
+                "radiusY": 100,
+                "z": 3,
+                "fillColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 100,
+                    "k": 0,
+                    "a": 1.0
+                },
+                "strokeColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 100,
+                    "a": 1.0
+                },
+                "strokeWidth": 1,
+                "lineStyle": "dashed"
+            },
+            {
+                "cx": 1100,
+                "cy": 200,
+                "radiusX": 120,
+                "radiusY": 80,
+                "z": 4,
+                "fillColor": {
+                    "c": 0,
+                    "m": 50,
+                    "y": 100,
+                    "k": 0,
+                    "a": 0.9
+                },
+                "strokeColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 100,
+                    "a": 1.0
+                },
+                "strokeWidth": 2,
+                "lineStyle": "dotted"
+            },
+            {
+                "cx": 1400,
+                "cy": 200,
+                "radiusX": 80,
+                "radiusY": 80,
+                "z": 5,
+                "fillColor": {
+                    "c": 50,
+                    "m": 0,
+                    "y": 50,
+                    "k": 0,
+                    "a": 0.7
+                },
+                "strokeColor": {
+                    "c": 100,
+                    "m": 0,
+                    "y": 0,
+                    "k": 0,
+                    "a": 1.0
+                },
+                "strokeWidth": 4,
+                "lineStyle": "solid"
+            }
+        ]
+    }
+}

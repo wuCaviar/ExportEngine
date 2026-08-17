@@ -1,0 +1,132 @@
+{
+    "canvas": {
+        "width": 2500,
+        "height": 2000,
+        "dpiX": 300,
+        "dpiY": 300,
+        "background": {
+            "c": 0,
+            "m": 0,
+            "y": 0,
+            "k": 5,
+            "a": 1.0
+        },
+        "rects": [
+            {
+                "unit": "px",
+                "x": 50,
+                "y": 50,
+                "width": 300,
+                "height": 200,
+                "z": 1,
+                "fillColor": {
+                    "c": 0,
+                    "m": 100,
+                    "y": 100,
+                    "k": 0,
+                    "a": 1.0
+                },
+                "strokeColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 100,
+                    "a": 1.0
+                },
+                "strokeWidth": 2,
+                "cornerRadius": 0,
+                "lineStyle": "solid"
+            },
+            {
+                "unit": "mm",
+                "x": 30,
+                "y": 30,
+                "width": 40,
+                "height": 20,
+                "z": 2,
+                "fillColor": {
+                    "c": 100,
+                    "m": 0,
+                    "y": 0,
+                    "k": 0,
+                    "a": 0.7
+                },
+                "strokeColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 80,
+                    "a": 1.0
+                },
+                "strokeWidth": 0.3,
+                "cornerRadius": 1.5,
+                "lineStyle": "dashed"
+            }
+        ],
+        "circles": [
+            {
+                "unit": "mm",
+                "cx": 60,
+                "cy": 60,
+                "radiusX": 12,
+                "radiusY": 8,
+                "z": 3,
+                "fillColor": {
+                    "c": 0,
+                    "m": 60,
+                    "y": 100,
+                    "k": 0,
+                    "a": 1.0
+                },
+                "strokeColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 100,
+                    "a": 1.0
+                },
+                "strokeWidth": 0.3,
+                "lineStyle": "solid"
+            }
+        ],
+        "lines": [
+            {
+                "unit": "mm",
+                "x1": 5,
+                "y1": 120,
+                "x2": 100,
+                "y2": 120,
+                "z": 4,
+                "strokeColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 50,
+                    "a": 1.0
+                },
+                "strokeWidth": 0.5,
+                "lineStyle": "dotted"
+            }
+        ],
+        "texts": [
+            {
+                "unit": "mm",
+                "x": 10,
+                "y": 80,
+                "z": 5,
+                "content": "Hello Units",
+                "fontFamily": "Arial",
+                "fontSize": 12,
+                "bold": false,
+                "italic": false,
+                "textColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 100,
+                    "a": 1.0
+                }
+            }
+        ]
+    }
+}

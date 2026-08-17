@@ -1,0 +1,209 @@
+{
+    "canvas": {
+        "width": 2000,
+        "height": 1200,
+        "dpiX": 300,
+        "dpiY": 300,
+        "background": {
+            "c": 0,
+            "m": 0,
+            "y": 0,
+            "k": 0,
+            "a": 1.0
+        },
+        "rects": [
+            {
+                "x": 50,
+                "y": 50,
+                "width": 350,
+                "height": 250,
+                "z": 1,
+                "fillColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 0,
+                    "a": 0.0
+                },
+                "strokeColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 100,
+                    "a": 1.0
+                },
+                "strokeWidth": 2,
+                "cornerRadius": 0,
+                "lineStyle": "solid"
+            },
+            {
+                "x": 450,
+                "y": 50,
+                "width": 350,
+                "height": 250,
+                "z": 2,
+                "fillColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 0,
+                    "a": 0.0
+                },
+                "strokeColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 100,
+                    "a": 1.0
+                },
+                "strokeWidth": 2,
+                "cornerRadius": 0,
+                "lineStyle": "dashed"
+            },
+            {
+                "x": 850,
+                "y": 50,
+                "width": 350,
+                "height": 250,
+                "z": 3,
+                "fillColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 0,
+                    "a": 0.0
+                },
+                "strokeColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 100,
+                    "a": 1.0
+                },
+                "strokeWidth": 2,
+                "cornerRadius": 0,
+                "lineStyle": "dotted"
+            },
+            {
+                "x": 1250,
+                "y": 50,
+                "width": 350,
+                "height": 250,
+                "z": 4,
+                "fillColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 0,
+                    "a": 0.0
+                },
+                "strokeColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 100,
+                    "a": 1.0
+                },
+                "strokeWidth": 2,
+                "cornerRadius": 0,
+                "lineStyle": "dashDot"
+            },
+            {
+                "x": 50,
+                "y": 400,
+                "width": 350,
+                "height": 250,
+                "z": 5,
+                "fillColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 0,
+                    "a": 0.0
+                },
+                "strokeColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 100,
+                    "a": 1.0
+                },
+                "strokeWidth": 2,
+                "cornerRadius": 0,
+                "lineStyle": "doubleDotDash"
+            },
+            {
+                "x": 450,
+                "y": 400,
+                "width": 350,
+                "height": 250,
+                "z": 6,
+                "fillColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 0,
+                    "a": 0.0
+                },
+                "strokeColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 100,
+                    "a": 1.0
+                },
+                "strokeWidth": 4,
+                "cornerRadius": 0,
+                "lineStyle": "solid"
+            },
+            {
+                "x": 850,
+                "y": 400,
+                "width": 350,
+                "height": 250,
+                "z": 7,
+                "fillColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 0,
+                    "a": 0.0
+                },
+                "strokeColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 100,
+                    "a": 1.0
+                },
+                "strokeWidth": 4,
+                "cornerRadius": 0,
+                "lineStyle": "dashed"
+            },
+            {
+                "x": 1250,
+                "y": 400,
+                "width": 350,
+                "height": 250,
+                "z": 8,
+                "fillColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 0,
+                    "a": 0.0
+                },
+                "strokeColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 100,
+                    "a": 1.0
+                },
+                "strokeWidth": 4,
+                "cornerRadius": 0,
+                "lineStyle": "dotted"
+            }
+        ]
+    }
+}

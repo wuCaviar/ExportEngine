@@ -1,0 +1,145 @@
+{
+    "canvas": {
+        "width": 2000,
+        "height": 1200,
+        "dpiX": 600,
+        "dpiY": 600,
+        "background": {
+            "c": 0,
+            "m": 0,
+            "y": 0,
+            "k": 0,
+            "a": 1.0
+        },
+        "lines": [
+            {
+                "x1": 50,
+                "y1": 100,
+                "x2": 1950,
+                "y2": 100,
+                "z": 1,
+                "strokeWidth": 1,
+                "strokeColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 100,
+                    "a": 1.0
+                },
+                "lineStyle": "solid"
+            },
+            {
+                "x1": 50,
+                "y1": 200,
+                "x2": 1950,
+                "y2": 200,
+                "z": 2,
+                "strokeWidth": 2,
+                "strokeColor": {
+                    "c": 100,
+                    "m": 0,
+                    "y": 0,
+                    "k": 0,
+                    "a": 1.0
+                },
+                "lineStyle": "solid"
+            },
+            {
+                "x1": 50,
+                "y1": 300,
+                "x2": 1950,
+                "y2": 300,
+                "z": 3,
+                "strokeWidth": 3,
+                "strokeColor": {
+                    "c": 0,
+                    "m": 100,
+                    "y": 0,
+                    "k": 0,
+                    "a": 1.0
+                },
+                "lineStyle": "dashed"
+            },
+            {
+                "x1": 50,
+                "y1": 400,
+                "x2": 1950,
+                "y2": 400,
+                "z": 4,
+                "strokeWidth": 4,
+                "strokeColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 100,
+                    "k": 0,
+                    "a": 1.0
+                },
+                "lineStyle": "dotted"
+            },
+            {
+                "x1": 50,
+                "y1": 500,
+                "x2": 1950,
+                "y2": 500,
+                "z": 5,
+                "strokeWidth": 5,
+                "strokeColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 100,
+                    "a": 1.0
+                },
+                "lineStyle": "dashDot"
+            },
+            {
+                "x1": 50,
+                "y1": 600,
+                "x2": 1950,
+                "y2": 600,
+                "z": 6,
+                "strokeWidth": 6,
+                "strokeColor": {
+                    "c": 50,
+                    "m": 50,
+                    "y": 0,
+                    "k": 0,
+                    "a": 1.0
+                },
+                "lineStyle": "doubleDotDash"
+            },
+            {
+                "x1": 100,
+                "y1": 50,
+                "x2": 100,
+                "y2": 1150,
+                "z": 7,
+                "strokeWidth": 2,
+                "strokeColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 100,
+                    "a": 1.0
+                },
+                "lineStyle": "solid"
+            },
+            {
+                "x1": 50,
+                "y1": 50,
+                "x2": 1950,
+                "y2": 1150,
+                "z": 8,
+                "strokeWidth": 2,
+                "strokeColor": {
+                    "c": 100,
+                    "m": 0,
+                    "y": 100,
+                    "k": 0,
+                    "a": 1.0
+                },
+                "lineStyle": "dashed"
+            }
+        ]
+    }
+}
