@@ -10,7 +10,7 @@
 #    define M_PI_2 1.57079632679489661923132169163975144
 #endif
 
-// Stateless math utilities for SDF-based rendering.
+// 基于 SDF 渲染的无状态数学工具。
 
 namespace ATHC::EE {
 
@@ -22,17 +22,17 @@ inline double smoothstep(double edge0, double edge1, double x)
     return t * t * (3.0 - 2.0 * t);
 }
 
-// Euclidean modulo — result is always in [0, m).
+// 欧几里得取模 — 结果始终在 [0, m) 范围内。
 inline double floorMod(double x, double m)
 {
     double r = std::fmod(x, m);
     return r < 0 ? r + m : r;
 }
 
-// Rounded rectangle SDF: returns positive inside, negative outside.
-// (px, py): point in local coords centered at rect center, unrotated.
-// halfW, halfH: rect half-width/half-height.
-// r: corner radius (clamped internally).
+// 圆角矩形 SDF：内部返回正值，外部返回负值。
+// (px, py)：局部坐标中的点，以矩形中心为原点，未旋转。
+// halfW, halfH：矩形的半宽/半高。
+// r：圆角半径（在内部被钳制）。
 inline double roundedRectSDF(double px, double py, double halfW, double halfH, double r)
 {
     r = std::min(r, std::min(halfW, halfH));
@@ -45,8 +45,8 @@ inline double roundedRectSDF(double px, double py, double halfW, double halfH, d
     return -(outside + inside - r);
 }
 
-// Integer alpha blending: dst = (src*a + dst*(255-a) + 127) / 255
-// Uses uint16 intermediate; ~3-5x faster than double-precision.
+// 整数 alpha 混合：dst = (src*a + dst*(255-a) + 127) / 255
+// 使用 uint16 中间值；比双精度快约 3-5 倍。
 inline uint8_t blendChannel(uint8_t dst, uint8_t src, uint8_t alpha)
 {
     if (alpha == 0)

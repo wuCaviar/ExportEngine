@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ExportEngine.h" // EE_API (dllexport / dllimport)
+#include "ExportEngine.h" // EE_API（dll 导出/导入）
 #include <system_error>
 
 namespace ATHC::EE {
@@ -59,69 +59,69 @@ public:
     {
         switch (static_cast<EEError>(ev)) {
         case EEError::io_failed:
-            return "generic I/O failure";
+            return "通用 I/O 失败";
         case EEError::parse_cannot_open_file:
-            return "cannot open scene JSON file";
+            return "无法打开场景 JSON 文件";
         case EEError::parse_invalid_json:
-            return "invalid JSON in scene file";
+            return "场景文件中 JSON 无效";
         case EEError::parse_root_not_object:
-            return "JSON root must be an object";
+            return "JSON 根节点必须是对象";
         case EEError::parse_invalid_canvas_unit:
-            return "invalid canvas unit (valid: px, mm)";
+            return "无效的画布单位（有效值：px, mm）";
         case EEError::parse_dimensions_not_positive:
-            return "canvas dimensions must be positive";
+            return "画布尺寸必须为正数";
         case EEError::parse_dpi_not_positive:
-            return "canvas DPI must be positive";
+            return "画布 DPI 必须为正数";
         case EEError::parse_converted_dimensions_not_positive:
-            return "canvas dimensions after unit conversion must be positive";
+            return "单位转换后的画布尺寸必须为正数";
         case EEError::parse_dpi_deprecated:
-            return "canvas field 'dpi' is deprecated, use 'dpiX' and 'dpiY'";
+            return "画布字段 'dpi' 已废弃，请使用 'dpiX' 和 'dpiY'";
         case EEError::parse_invalid_color:
-            return "color must be an object";
+            return "颜色必须是对象";
         case EEError::parse_rgba_color_removed:
-            return "RGB colors are removed, use CMYK (c/m/y/k)";
+            return "RGB 颜色已移除，请使用 CMYK (c/m/y/k)";
         case EEError::parse_color_space_field_removed:
-            return "color field 'space' is removed, write c/m/y/k directly";
+            return "颜色字段 'space' 已移除，直接写入 c/m/y/k";
         case EEError::icc_open_failed:
-            return "failed to open ICC profile file";
+            return "无法打开 ICC 配置文件";
         case EEError::icc_parse_failed:
-            return "failed to parse ICC profile";
+            return "解析 ICC 配置文件失败";
         case EEError::icc_not_initialized:
-            return "colour converter not initialized";
+            return "颜色转换器未初始化";
         case EEError::tiff_open_failed:
-            return "failed to open TIFF file for writing";
+            return "打开 TIFF 文件写入失败";
         case EEError::tiff_no_session:
-            return "TIFF write operation without an active session";
+            return "TIFF 写入操作没有活动会话";
         case EEError::tiff_write_strip_failed:
-            return "libtiff failed to write a strip";
+            return "libtiff 写入条带失败";
         case EEError::font_library_init_failed:
-            return "FreeType library initialization failed";
+            return "FreeType 库初始化失败";
         case EEError::font_invalid_family_name:
-            return "invalid font family name";
+            return "无效的字体族名称";
         case EEError::font_not_found:
-            return "font family not found on this system";
+            return "系统中未找到该字体族";
         case EEError::font_face_load_failed:
-            return "failed to load font file";
+            return "加载字体文件失败";
         case EEError::font_cairo_face_failed:
-            return "failed to create Cairo font face";
+            return "创建 Cairo 字体面失败";
         case EEError::font_scaled_font_failed:
-            return "failed to create scaled font";
+            return "创建缩放字体失败";
         case EEError::image_decode_failed:
-            return "failed to decode image";
+            return "解码图像失败";
         case EEError::image_unsupported_colourspace:
-            return "image uses an unsupported colourspace";
+            return "图像使用了不支持的颜色空间";
         case EEError::image_band_count_mismatch:
-            return "image band count mismatch";
+            return "图像波段数量不匹配";
         case EEError::composite_failed:
-            return "tile/strip composite failed";
+            return "图块/条带合成失败";
         case EEError::sink_unsupported_granularity:
-            return "sink does not support the requested granularity";
+            return "接收器不支持请求的粒度";
         case EEError::sink_not_initialized:
-            return "sink write called before begin or size mismatch";
+            return "在 begin 之前调用 sink write 或尺寸不匹配";
         case EEError::sink_write_failed:
-            return "sink failed to consume rendered data";
+            return "接收器未能消费渲染数据";
         }
-        return "unknown EEError";
+        return "未知 EEError";
     }
 
     bool recoverable(int ev) const noexcept
@@ -142,10 +142,9 @@ public:
     }
 };
 
-// EE_API: exported from ExportEngine.dll so EXEs and the DLL share ONE
-// category instance. std::error_code equality compares category objects by
-// pointer — a per-module static would make error_codes created inside the
-// DLL never compare equal to enums converted in test/consumer code.
+// EE_API: 从 ExportEngine.dll 导出，以便 EXE 和 DLL 共享同一个
+// 错误类别实例。std::error_code 通过指针比较类别对象——如果每个模块使用独立的静态变量，
+// 则 DLL 内部创建的 error_code 将永远无法与测试/消费者代码中转换的枚举值相等。
 inline EE_API const std::error_category &eeErrorCategory() noexcept
 {
     static const EEErrorCategory s_category;

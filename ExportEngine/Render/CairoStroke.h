@@ -7,8 +7,8 @@
 #include <algorithm>
 #include <cmath>
 
-// Cairo-based stroke rendering replaces the AGG pipeline.
-// AggStroke.h can be deleted once all call sites are migrated.
+// 基于 Cairo 的描边渲染替代 AGG 管线。
+// 一旦所有调用点迁移完成，AggStroke.h 即可删除。
 
 namespace ATHC::EE {
 
@@ -16,8 +16,8 @@ namespace CairoStroke {
 
 using PathBuilder = std::function<void(cairo_t *)>;
 
-// Configure cairo_t dash / cap / join for the given line style.
-// Dash lengths are scaled by stroke width to match AGG behaviour.
+// 为给定的线样式配置 cairo_t 的虚线/端点/连接方式。
+// 虚线长度按线宽缩放，以匹配 AGG 行为。
 inline void setupLineStyle(cairo_t *cr, LineStyle lineStyle, double strokeWidth)
 {
     double sw = std::max(strokeWidth, 0.1);
@@ -51,19 +51,17 @@ inline void setupLineStyle(cairo_t *cr, LineStyle lineStyle, double strokeWidth)
         return;
     }
 
-    // Dashed / dotted lines: round caps so short segments render as filled dots.
-    // Matches AGG round_cap / round_join behaviour.
+    // 虚线/点线：圆形端点，使短线段渲染为填充圆点。
+    // 匹配 AGG 的 round_cap / round_join 行为。
     cairo_set_line_cap(cr, CAIRO_LINE_CAP_ROUND);
     cairo_set_line_join(cr, CAIRO_LINE_JOIN_ROUND);
 }
 
-// Stroke a path into an A8 surface and composite the coverage values into
-// the RenderContext.  buildPath receives a cairo_t that has already been
-// translated so that bbox (x0,y0) maps to surface origin.
+// 将路径描边渲染到 A8 表面，并将覆盖值合成到 RenderContext 中。
+// buildPath 接收一个已平移的 cairo_t，使得 bbox (x0,y0) 映射到表面原点。
 //
-// bbox must be tight enough to bound the stroked outline (strokeWidth
-// already added by caller).  Call sites that don't have a ready bbox can
-// compute one from the un-stroked path points.
+// bbox 必须足够紧密以包围描边轮廓（调用者已添加 strokeWidth）。
+// 没有现成 bbox 的调用点可以从未描边的路径点计算一个。
 inline void render(RenderContext &ctx, PathBuilder buildPath, double strokeWidth,
     LineStyle lineStyle, const Color &strokeColor, uint8_t c1, uint8_t c2, uint8_t c3, uint8_t c4,
     uint8_t a, double bboxX0, double bboxY0, double bboxX1, double bboxY1)
@@ -73,10 +71,10 @@ inline void render(RenderContext &ctx, PathBuilder buildPath, double strokeWidth
     if (strokeColor.alpha <= 0.0)
         return;
 
-    // Intersect the stroke bbox with the current render window (plus a 1 px
-    // AA fringe) so the A8 surface stays window-sized even for full-canvas
-    // strokes — a 120000 px tall line used to build a ~119500 px tall
-    // surface and was then silently dropped by the size guard below.
+    // 将描边 bbox 与当前渲染窗口相交（外加 1 像素 AA 边缘），
+    // 因此即使对于全画布描边，A8 表面也保持窗口大小——
+    // 一个 120000 像素高的线条曾经构建了一个约 119500 像素高的表面，
+    // 然后被下面的尺寸保护静默丢弃。
     int clipX0 = (ctx.tileW > 0) ? ctx.tileX : 0;
     int clipX1 = (ctx.tileW > 0) ? ctx.tileX + ctx.tileW : ctx.canvasWidth;
     int clipY0 = (ctx.tileW > 0) ? ctx.tileY : 0;
@@ -87,19 +85,19 @@ inline void render(RenderContext &ctx, PathBuilder buildPath, double strokeWidth
     double sX1 = std::min(bboxX1, static_cast<double>(clipX1)) + 1.0;
     double sY1 = std::min(bboxY1, static_cast<double>(clipY1)) + 1.0;
     if (sX1 <= sX0 || sY1 <= sY0)
-        return; // bbox does not overlap the render window
+        return; // bbox 与渲染窗口不重叠
 
-    // Expand by 1 px for AA fringe, then clamp
+    // 扩展 1 像素用于 AA 边缘，然后钳制
     int surfX = std::max(0, static_cast<int>(std::floor(sX0)));
     int surfY = std::max(0, static_cast<int>(std::floor(sY0)));
     int surfW = static_cast<int>(std::ceil(sX1)) - surfX + 2;
     int surfH = static_cast<int>(std::ceil(sY1)) - surfY + 2;
 
-    // Guard against degenerate / out-of-range surfaces
+    // 防止退化/超出范围的表面
     if (surfW <= 0 || surfH <= 0 || surfW > 32768 || surfH > 32768)
         return;
 
-    // ── Render into A8 surface ──────────────────────────────────────
+    // ── 渲染到 A8 表面 ──────────────────────────────────────
     cairo_surface_t *surface = cairo_image_surface_create(CAIRO_FORMAT_A8, surfW, surfH);
     if (cairo_surface_status(surface) != CAIRO_STATUS_SUCCESS) {
         cairo_surface_destroy(surface);
@@ -115,7 +113,7 @@ inline void render(RenderContext &ctx, PathBuilder buildPath, double strokeWidth
     setupLineStyle(cr, lineStyle, strokeWidth);
     cairo_stroke(cr);
 
-    // ── Read back coverage and blend into output ────────────────────
+    // ── 读取覆盖值并合成到输出 ────────────────────
     cairo_surface_flush(surface);
     const unsigned char *data = cairo_image_surface_get_data(surface);
     int stride = cairo_image_surface_get_stride(surface);
