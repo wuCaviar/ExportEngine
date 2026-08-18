@@ -2,8 +2,8 @@
 #include "RenderContext.h"
 #include "SceneData.h"
 
-// Stroke-only path primitives (FreeLine, BezierCurve, Line).
-// All three use Cairo's path building + CairoStroke pipeline.
+// 仅描边的路径图元（FreeLine、BezierCurve、Line）。
+// 三者均使用 Cairo 的路径构建 + CairoStroke 管线。
 
 namespace ATHC::EE {
 
