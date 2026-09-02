@@ -16,11 +16,12 @@ class CallbackSink : public IRenderSink
 public:
     using BeginFn = std::function<bool(const SinkDescriptor &)>;
     using StripFn = std::function<bool(int startRow, int rows, const std::vector<uint8_t> &)>;
-    using EndFn = std::function<bool()>;
+    using EndFn   = std::function<bool()>;
 
     CallbackSink(BeginFn onBegin, StripFn onStrip, EndFn onEnd)
         : m_onBegin(std::move(onBegin)), m_onStrip(std::move(onStrip)), m_onEnd(std::move(onEnd))
-    { }
+    {
+    }
 
     SinkGranularity granularity() const noexcept override { return SinkGranularity::Strip; }
 
@@ -56,7 +57,7 @@ public:
 private:
     BeginFn m_onBegin;
     StripFn m_onStrip;
-    EndFn m_onEnd;
+    EndFn   m_onEnd;
 };
 
 } // namespace ATHC::EE

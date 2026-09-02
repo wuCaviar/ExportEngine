@@ -1,5 +1,5 @@
 #include "TiffWriter.h"
-#include "TiffHelper.h"
+#include "FileUtil.h"
 
 #include <tiffio.h>
 #include <algorithm>
@@ -68,7 +68,7 @@ void TiffWriter::teardownSession()
     // Called after the TIFF handle is closed. Resets per-session state so
     // a subsequent begin*() call starts fresh.
     m_queue.reset();
-    m_mode = SessionMode::None;
+    m_mode         = SessionMode::None;
     m_rowsPerStrip = 0;
 }
 
@@ -96,8 +96,12 @@ TiffWriter::~TiffWriter()
 //  TIFF field setup
 // ============================================================
 
-void TiffWriter::setupTiffCommon(TIFF *tif, int width, int height, Dpi dpi, int samplesPerPixel,
-    const std::vector<uint16_t> &sampleInfo)
+void TiffWriter::setupTiffCommon(TIFF                        *tif,
+                                 int                          width,
+                                 int                          height,
+                                 Dpi                          dpi,
+                                 int                          samplesPerPixel,
+                                 const std::vector<uint16_t> &sampleInfo)
 {
     TIFFSetField(tif, TIFFTAG_IMAGEWIDTH, static_cast<uint32_t>(width));
     TIFFSetField(tif, TIFFTAG_IMAGELENGTH, static_cast<uint32_t>(height));
@@ -112,7 +116,7 @@ void TiffWriter::setupTiffCommon(TIFF *tif, int width, int height, Dpi dpi, int 
     TIFFSetField(tif, TIFFTAG_RESOLUTIONUNIT, RESUNIT_INCH);
     if (samplesPerPixel > 4 && !sampleInfo.empty()) {
         TIFFSetField(tif, TIFFTAG_EXTRASAMPLES, static_cast<uint16_t>(samplesPerPixel - 4),
-            sampleInfo.data());
+                     sampleInfo.data());
     }
 }
 
@@ -145,9 +149,14 @@ int TiffWriter::defaultRowsPerStrip(int width, int height)
 //                  backpressure:│
 //                  queue full → block producer
 
-bool TiffWriter::beginStripWrite(const std::string &filePath, int width, int height, Dpi dpi,
-    int rowsPerStrip, const std::vector<uint8_t> &iccBytes, int samplesPerPixel,
-    const std::vector<uint16_t> &sampleInfo)
+bool TiffWriter::beginStripWrite(const std::string           &filePath,
+                                 int                          width,
+                                 int                          height,
+                                 Dpi                          dpi,
+                                 int                          rowsPerStrip,
+                                 const std::vector<uint8_t>  &iccBytes,
+                                 int                          samplesPerPixel,
+                                 const std::vector<uint16_t> &sampleInfo)
 {
     // Reset error state at the very start of every begin*() call, so a
     // previous session's error can never leak into this one (first-error-wins).
@@ -163,8 +172,8 @@ bool TiffWriter::beginStripWrite(const std::string &filePath, int width, int hei
         rowsPerStrip = defaultRowsPerStrip(width, height);
 
     m_samplesPerPixel = samplesPerPixel;
-    m_sampleInfo = sampleInfo;
-    m_tif = TiffHelper::openTiff(filePath, "w8");
+    m_sampleInfo      = sampleInfo;
+    m_tif             = FileUtil::openTiff(filePath, "w8");
     if (!m_tif) {
         setError(EEError::tiff_open_failed);
         return false;
@@ -175,17 +184,17 @@ bool TiffWriter::beginStripWrite(const std::string &filePath, int width, int hei
     TIFFSetField(m_tif, TIFFTAG_ORIENTATION, ORIENTATION_TOPLEFT);
 
     if (!iccBytes.empty()) {
-        TIFFSetField(
-            m_tif, TIFFTAG_ICCPROFILE, static_cast<uint32_t>(iccBytes.size()), iccBytes.data());
+        TIFFSetField(m_tif, TIFFTAG_ICCPROFILE, static_cast<uint32_t>(iccBytes.size()),
+                     iccBytes.data());
     }
 
-    m_width = width;
-    m_height = height;
+    m_width        = width;
+    m_height       = height;
     m_rowsPerStrip = rowsPerStrip;
-    m_mode = SessionMode::Strip;
+    m_mode         = SessionMode::Strip;
 
     m_ioError.store(false);
-    m_queue = std::make_unique<BoundedQueue>(kQueueCapacity);
+    m_queue    = std::make_unique<BoundedQueue>(kQueueCapacity);
     m_ioThread = std::thread(&TiffWriter::ioWorker, this);
     return true;
 }
@@ -238,7 +247,7 @@ bool TiffWriter::writeStrip(int startRow, int rows, std::vector<uint8_t> cmykBuf
 void TiffWriter::ioWorker()
 {
     WriteTask task;
-    bool failed = false;
+    bool      failed = false;
     // Drain the queue until closed-and-empty. On error, set the failure
     // flag, close the queue (rejects further pushes), and keep draining
     // so blocked producers can unblock and observe m_ioError.
@@ -246,9 +255,10 @@ void TiffWriter::ioWorker()
         if (failed)
             continue; // discard remaining items, just unblock producers
 
-        const bool ok = TIFFWriteEncodedStrip(m_tif, static_cast<tstrip_t>(task.index),
-                            task.buffer.data(), static_cast<tsize_t>(task.buffer.size()))
-                        >= 0;
+        const bool ok =
+            TIFFWriteEncodedStrip(m_tif, static_cast<tstrip_t>(task.index), task.buffer.data(),
+                                  static_cast<tsize_t>(task.buffer.size()))
+            >= 0;
         if (!ok)
             setError(EEError::tiff_write_strip_failed);
 

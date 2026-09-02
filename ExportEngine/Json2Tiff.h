@@ -45,13 +45,13 @@ using ProgressCallback = std::function<void(int current, int total, const std::s
 using ErrorCallback = std::function<void(std::error_code error)>;
 
 /// 一次导出过程共享的可插拔服务（策略）。
-/// 成员为空 → 引擎用内置默认（ColorConverter = LittleCMS2，NearestResampler = vips 最近邻）。
+/// 成员为空 → 引擎用内置默认（LcmsColorConverter = LittleCMS2，VipsResampler = vips 最近邻）。
 /// 传入自定义实现即可替换颜色转换 / 像素缩放 / 渲染输出接收器，EE 只做数据整合。
 struct RenderServices
 {
-    std::shared_ptr<IColorConverter> color; // 颜色转换引擎（源 → CMYK）
-    std::shared_ptr<IResampler> resampler; // 像素缩放
-    std::shared_ptr<IRenderSink> sink; // 渲染输出接收器（必需）
+    std::shared_ptr<IColorConverter> color;     // 颜色转换引擎（源 → CMYK）
+    std::shared_ptr<IResampler>      resampler; // 像素缩放
+    std::shared_ptr<IRenderSink>     sink;      // 渲染输出接收器（必需）
 };
 
 /// JSON 场景文件 → TIFF（便捷入口）。
@@ -63,8 +63,10 @@ struct RenderServices
 ///                    （EEError 域或 system/filesystem 域），宿主可用 ec == EEError::x 分类、
 ///                    ATHC::EE::isRecoverable(ec) 判断可恢复性
 /// @return true 成功, false 失败
-EE_API bool json2tiff(const std::string &jsonPath, const std::string &tiffPath,
-    ProgressCallback progress = nullptr, ErrorCallback onError = nullptr);
+EE_API bool json2tiff(const std::string &jsonPath,
+                      const std::string &tiffPath,
+                      ProgressCallback   progress = nullptr,
+                      ErrorCallback      onError  = nullptr);
 
 /// JSON 场景文件 → 任意渲染输出接收器（services.sink）。
 ///
@@ -77,7 +79,9 @@ EE_API bool json2tiff(const std::string &jsonPath, const std::string &tiffPath,
 /// @param progress     进度回调 (nullptr 表示不需要)
 /// @param onError      错误回调 (nullptr 表示不需要)
 /// @return true 成功, false 失败
-EE_API bool json2sink(const std::string &jsonPath, const RenderServices &services,
-    ProgressCallback progress = nullptr, ErrorCallback onError = nullptr);
+EE_API bool json2sink(const std::string    &jsonPath,
+                      const RenderServices &services,
+                      ProgressCallback      progress = nullptr,
+                      ErrorCallback         onError  = nullptr);
 
 } // namespace ATHC::EE

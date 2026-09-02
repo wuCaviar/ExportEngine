@@ -14,8 +14,8 @@ struct Vec2
 };
 
 // ── Catmull-Rom → cubic Bézier (chordal parameterisation) ──────────
-static void addCatmullRomSegment(
-    cairo_t *cr, const Vec2 &p0, const Vec2 &p1, const Vec2 &p2, const Vec2 &p3)
+static void
+addCatmullRomSegment(cairo_t *cr, const Vec2 &p0, const Vec2 &p1, const Vec2 &p2, const Vec2 &p3)
 {
     double t01 = std::hypot(p1.x - p0.x, p1.y - p0.y);
     double t12 = std::hypot(p2.x - p1.x, p2.y - p1.y);
@@ -24,19 +24,19 @@ static void addCatmullRomSegment(
     double m1x = (p2.x - p1.x
                   + t12
                         * ((p1.x - p0.x) / std::max(t01, 1e-10)
-                            - (p2.x - p0.x) / std::max(t01 + t12, 1e-10)));
+                           - (p2.x - p0.x) / std::max(t01 + t12, 1e-10)));
     double m1y = (p2.y - p1.y
                   + t12
                         * ((p1.y - p0.y) / std::max(t01, 1e-10)
-                            - (p2.y - p0.y) / std::max(t01 + t12, 1e-10)));
+                           - (p2.y - p0.y) / std::max(t01 + t12, 1e-10)));
     double m2x = (p2.x - p1.x
                   + t12
                         * ((p3.x - p2.x) / std::max(t23, 1e-10)
-                            - (p3.x - p1.x) / std::max(t12 + t23, 1e-10)));
+                           - (p3.x - p1.x) / std::max(t12 + t23, 1e-10)));
     double m2y = (p2.y - p1.y
                   + t12
                         * ((p3.y - p2.y) / std::max(t23, 1e-10)
-                            - (p3.y - p1.y) / std::max(t12 + t23, 1e-10)));
+                           - (p3.y - p1.y) / std::max(t12 + t23, 1e-10)));
 
     const double cp1x = p1.x + m1x / 3.0;
     const double cp1y = p1.y + m1y / 3.0;
@@ -52,8 +52,8 @@ static Vec2 mirrorPoint(const Vec2 &p, const Vec2 &r)
 }
 
 // Quadratic Bézier → cubic Bézier helper
-static void cairoQuadTo(
-    cairo_t *cr, double x0, double y0, double x1, double y1, double x2, double y2)
+static void
+cairoQuadTo(cairo_t *cr, double x0, double y0, double x1, double y1, double x2, double y2)
 {
     double c1x = x0 + 2.0 / 3.0 * (x1 - x0);
     double c1y = y0 + 2.0 / 3.0 * (y1 - y0);
@@ -63,8 +63,12 @@ static void cairoQuadTo(
 }
 
 // Compute bounding box of path points, expanded by strokeWidth
-static void pathBBox(const std::vector<Vec2> &pts, double strokeWidth, double &x0, double &y0,
-    double &x1, double &y1)
+static void pathBBox(const std::vector<Vec2> &pts,
+                     double                   strokeWidth,
+                     double                  &x0,
+                     double                  &y0,
+                     double                  &x1,
+                     double                  &y1)
 {
     x0 = y0 = 1e15;
     x1 = y1 = -1e15;
@@ -105,7 +109,7 @@ void PathRenderer::drawFreeLine(RenderContext &ctx, const FreeLine &line)
 
     // Mirrored endpoints for smooth tangent computation
     Vec2 first = mirrorPoint(pts[0], pts[1]);
-    Vec2 last = mirrorPoint(pts[n - 1], pts[n - 2]);
+    Vec2 last  = mirrorPoint(pts[n - 1], pts[n - 2]);
 
     // Bounding box
     double bboxX0, bboxY0, bboxX1, bboxY1;
@@ -128,7 +132,7 @@ void PathRenderer::drawFreeLine(RenderContext &ctx, const FreeLine &line)
     };
 
     CairoStroke::render(ctx, buildPath, line.strokeWidth, line.lineStyle, line.strokeColor, sc1,
-        sc2, sc3, sc4, sa, bboxX0, bboxY0, bboxX1, bboxY1);
+                        sc2, sc3, sc4, sa, bboxX0, bboxY0, bboxX1, bboxY1);
 }
 
 // ── BezierCurve ───────────────────────────────────────────────────────
@@ -164,13 +168,13 @@ void PathRenderer::drawBezier(RenderContext &ctx, const BezierCurve &curve)
         } else {
             for (size_t i = 0; i + 3 < n; i += 3) {
                 cairo_curve_to(cr, cpts[i + 1].x, cpts[i + 1].y, cpts[i + 2].x, cpts[i + 2].y,
-                    cpts[i + 3].x, cpts[i + 3].y);
+                               cpts[i + 3].x, cpts[i + 3].y);
             }
         }
     };
 
     CairoStroke::render(ctx, buildPath, curve.strokeWidth, curve.lineStyle, curve.strokeColor, sc1,
-        sc2, sc3, sc4, sa, bboxX0, bboxY0, bboxX1, bboxY1);
+                        sc2, sc3, sc4, sa, bboxX0, bboxY0, bboxX1, bboxY1);
 }
 
 // ── Line ──────────────────────────────────────────────────────────────
@@ -186,7 +190,7 @@ void PathRenderer::drawLine(RenderContext &ctx, const Line &line)
     uint8_t sc1 = 0, sc2 = 0, sc3 = 0, sc4 = 0, sa = 0;
     ctx.prepareColor(line.strokeColor, sc1, sc2, sc3, sc4, sa);
 
-    double pad = line.strokeWidth * 0.5 + 1.0;
+    double pad    = line.strokeWidth * 0.5 + 1.0;
     double bboxX0 = std::min(line.x1, line.x2) - pad;
     double bboxY0 = std::min(line.y1, line.y2) - pad;
     double bboxX1 = std::max(line.x1, line.x2) + pad;
@@ -198,5 +202,5 @@ void PathRenderer::drawLine(RenderContext &ctx, const Line &line)
     };
 
     CairoStroke::render(ctx, buildPath, line.strokeWidth, line.lineStyle, line.strokeColor, sc1,
-        sc2, sc3, sc4, sa, bboxX0, bboxY0, bboxX1, bboxY1);
+                        sc2, sc3, sc4, sa, bboxX0, bboxY0, bboxX1, bboxY1);
 }

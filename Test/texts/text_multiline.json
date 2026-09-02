@@ -1,0 +1,174 @@
+{
+    "canvas": {
+        "width": 3000,
+        "height": 2600,
+        "dpiX": 150,
+        "dpiY": 150,
+        "background": {
+            "c": 0,
+            "m": 0,
+            "y": 0,
+            "k": 5,
+            "a": 1.0
+        },
+        "texts": [
+            {
+                "comment": "多行文本 — 自然尺寸(无 width/height)",
+                "x": 120,
+                "y": 120,
+                "z": 1,
+                "content": "第一行 First Line\n第二行 Second Line\n第三行 Third Line",
+                "fontFamily": "SimSun",
+                "fontSize": 28,
+                "bold": false,
+                "italic": false,
+                "textColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 100,
+                    "a": 1.0
+                }
+            },
+            {
+                "comment": "多行文本 — 非等比缩放到 600x150(横向拉伸)",
+                "x": 120,
+                "y": 400,
+                "z": 2,
+                "content": "第一行 First Line\n第二行 Second Line\n第三行 Third Line",
+                "fontFamily": "SimSun",
+                "fontSize": 28,
+                "bold": false,
+                "italic": false,
+                "width": 600,
+                "height": 150,
+                "textColor": {
+                    "c": 100,
+                    "m": 0,
+                    "y": 0,
+                    "k": 0,
+                    "a": 1.0
+                }
+            },
+            {
+                "comment": "多行文本 — 缩放到 300x300(纵向拉伸)",
+                "x": 900,
+                "y": 120,
+                "z": 3,
+                "content": "第一行 First Line\n第二行 Second Line\n第三行 Third Line",
+                "fontFamily": "SimHei",
+                "fontSize": 28,
+                "bold": false,
+                "italic": false,
+                "width": 300,
+                "height": 300,
+                "textColor": {
+                    "c": 0,
+                    "m": 100,
+                    "y": 0,
+                    "k": 0,
+                    "a": 1.0
+                }
+            },
+            {
+                "comment": "下划线 — 单行",
+                "x": 120,
+                "y": 700,
+                "z": 4,
+                "content": "Underline Text 下划线文本",
+                "fontFamily": "Microsoft YaHei",
+                "fontSize": 32,
+                "bold": false,
+                "italic": false,
+                "underline": true,
+                "textColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 100,
+                    "a": 1.0
+                }
+            },
+            {
+                "comment": "下划线 + 多行 + 缩放",
+                "x": 120,
+                "y": 850,
+                "z": 5,
+                "content": "下划线多行 One\n下划线多行 Two\n下划线多行 Three",
+                "fontFamily": "SimSun",
+                "fontSize": 24,
+                "bold": true,
+                "italic": false,
+                "underline": true,
+                "width": 500,
+                "height": 140,
+                "textColor": {
+                    "c": 100,
+                    "m": 50,
+                    "y": 0,
+                    "k": 0,
+                    "a": 1.0
+                }
+            },
+            {
+                "comment": "仅 width — 高度自然",
+                "x": 120,
+                "y": 1150,
+                "z": 6,
+                "content": "宽度拉伸\n高度自然",
+                "fontFamily": "SimHei",
+                "fontSize": 28,
+                "bold": false,
+                "italic": false,
+                "width": 800,
+                "textColor": {
+                    "c": 0,
+                    "m": 0,
+                    "y": 0,
+                    "k": 100,
+                    "a": 1.0
+                }
+            },
+            {
+                "comment": "仅 height — 宽度自然",
+                "x": 120,
+                "y": 1450,
+                "z": 7,
+                "content": "宽度自然\n高度拉伸",
+                "fontFamily": "SimHei",
+                "fontSize": 28,
+                "bold": false,
+                "italic": false,
+                "height": 300,
+                "textColor": {
+                    "c": 0,
+                    "m": 100,
+                    "y": 100,
+                    "k": 0,
+                    "a": 1.0
+                }
+            },
+            {
+                "comment": "粗斜体 + 下划线 + 缩放 + 中英混排多行",
+                "x": 120,
+                "y": 1900,
+                "z": 8,
+                "content": "春眠不觉晓，处处闻啼鸟。\nThe quick brown fox jumps over the lazy dog.",
+                "fontFamily": "Microsoft YaHei",
+                "fontSize": 24,
+                "bold": true,
+                "italic": true,
+                "underline": true,
+                "width": 900,
+                "height": 160,
+                "textColor": {
+                    "c": 0,
+                    "m": 100,
+                    "y": 0,
+                    "k": 0,
+                    "a": 1.0
+                }
+            }
+        ]
+    }
+}

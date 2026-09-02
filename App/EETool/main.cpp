@@ -73,7 +73,7 @@ std::wstring Utf8ToWide(const std::string &utf8)
 
 static void printUsage(const char *prog)
 {
-    std::cout << "EETool — JSON → TIFF converter  v" << Version::semantic() << "\n\n";
+    std::cout << "EETool — JSON → TIFF converter  v" << EE_getVersion() << "\n\n";
     std::cout << "Usage:\n";
     std::cout << "  " << prog << " <input.json>  -o <output.tiff>       Single file\n";
     std::cout << "  " << prog << " <input_dir/>  -o <output_dir/>       Batch folder\n\n";
@@ -86,7 +86,7 @@ static void printUsage(const char *prog)
 int main(int argc, char *argv[])
 {
     EELog::initLogger();
-    EELog::info("ExportEngine {}", Version::full());
+    EELog::info("ExportEngine {}", EE_getVersion());
 
     // Parse arguments
     std::string inputPath;
@@ -99,7 +99,7 @@ int main(int argc, char *argv[])
             return 0;
         }
         if (arg == "-v" || arg == "--version") {
-            std::cout << Version::full() << "/n";
+            std::cout << EE_getVersion() << "/n";
             return 0;
         }
         if (arg == "-o") {

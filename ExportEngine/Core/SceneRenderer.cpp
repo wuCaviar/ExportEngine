@@ -2,7 +2,6 @@
 #include "IColorConverter.h"
 #include "IResampler.h"
 #include "RenderContext.h"
-#include "FontEngine.h"
 #include "RectRenderer.h"
 #include "CircleRenderer.h"
 #include "PathRenderer.h"
@@ -11,7 +10,7 @@
 #include "TextureSource.h"
 #include "RenderMath.h"
 #include "PredecodeScheduler.h"
-#include "TiffHelper.h"
+#include "FileUtil.h"
 
 #include <algorithm>
 #include <tuple>
@@ -32,12 +31,7 @@ using namespace ATHC::EE;
 //  Constructor / Destructor
 // ============================================================
 
-SceneRenderer::SceneRenderer()
-{
-    m_fontEngine = std::make_unique<FontEngine>();
-    m_fontEngine->init();
-}
-
+SceneRenderer::SceneRenderer()  = default;
 SceneRenderer::~SceneRenderer() = default;
 
 void SceneRenderer::setConverter(IColorConverter *converter)
@@ -70,17 +64,17 @@ int roundDn(double v)
 DrawBBox SceneRenderer::computeBBox(DrawType type, const void *prim, const Canvas *canvasHint)
 {
     DrawBBox bb;
-    double xMin = 0, xMax = 0, yMin = 0, yMax = 0;
+    double   xMin = 0, xMax = 0, yMin = 0, yMax = 0;
 
     switch (type) {
     case DrawType::RECT: {
         auto &r = *static_cast<const Rect *>(prim);
         if (r.width <= 0 || r.height <= 0)
             return bb;
-        xMin = r.x;
-        xMax = r.x + r.width;
-        yMin = r.y;
-        yMax = r.y + r.height;
+        xMin      = r.x;
+        xMax      = r.x + r.width;
+        yMin      = r.y;
+        yMax      = r.y + r.height;
         double sw = r.strokeWidth * 0.5;
         xMin -= sw;
         xMax += sw;
@@ -89,21 +83,21 @@ DrawBBox SceneRenderer::computeBBox(DrawType type, const void *prim, const Canva
         break;
     }
     case DrawType::CIRCLE: {
-        auto &c = *static_cast<const Circle *>(prim);
+        auto  &c = *static_cast<const Circle *>(prim);
         double r = std::max(c.radiusX, c.radiusY) + c.strokeWidth;
-        xMin = c.cx - r;
-        xMax = c.cx + r;
-        yMin = c.cy - r;
-        yMax = c.cy + r;
+        xMin     = c.cx - r;
+        xMax     = c.cx + r;
+        yMin     = c.cy - r;
+        yMax     = c.cy + r;
         break;
     }
     case DrawType::LINE: {
-        auto &l = *static_cast<const Line *>(prim);
+        auto  &l   = *static_cast<const Line *>(prim);
         double sw2 = l.strokeWidth * 0.5 + 1.0;
-        xMin = std::min(l.x1, l.x2) - sw2;
-        xMax = std::max(l.x1, l.x2) + sw2;
-        yMin = std::min(l.y1, l.y2) - sw2;
-        yMax = std::max(l.y1, l.y2) + sw2;
+        xMin       = std::min(l.x1, l.x2) - sw2;
+        xMax       = std::max(l.x1, l.x2) + sw2;
+        yMin       = std::min(l.y1, l.y2) - sw2;
+        yMax       = std::max(l.y1, l.y2) + sw2;
         break;
     }
     case DrawType::FREELINE: {
@@ -111,10 +105,10 @@ DrawBBox SceneRenderer::computeBBox(DrawType type, const void *prim, const Canva
         if (fl.points.empty())
             return bb;
         double sw2 = fl.strokeWidth * 0.5 + 1.0;
-        xMin = fl.points[0].first;
-        xMax = fl.points[0].first;
-        yMin = fl.points[0].second;
-        yMax = fl.points[0].second;
+        xMin       = fl.points[0].first;
+        xMax       = fl.points[0].first;
+        yMin       = fl.points[0].second;
+        yMax       = fl.points[0].second;
         for (auto &p : fl.points) {
             if (p.first < xMin)
                 xMin = p.first;
@@ -136,10 +130,10 @@ DrawBBox SceneRenderer::computeBBox(DrawType type, const void *prim, const Canva
         if (bc.controlPoints.empty())
             return bb;
         double sw2 = bc.strokeWidth * 0.5 + 1.0;
-        xMin = bc.controlPoints[0].first;
-        xMax = bc.controlPoints[0].first;
-        yMin = bc.controlPoints[0].second;
-        yMax = bc.controlPoints[0].second;
+        xMin       = bc.controlPoints[0].first;
+        xMax       = bc.controlPoints[0].first;
+        yMin       = bc.controlPoints[0].second;
+        yMax       = bc.controlPoints[0].second;
         for (auto &p : bc.controlPoints) {
             if (p.first < xMin)
                 xMin = p.first;
@@ -157,20 +151,46 @@ DrawBBox SceneRenderer::computeBBox(DrawType type, const void *prim, const Canva
         break;
     }
     case DrawType::TEXT: {
-        auto &t = *static_cast<const Text *>(prim);
-        int dpi = canvasHint ? canvasHint->dpi.x : 72;
-        double pxSize = t.fontSize * static_cast<double>(dpi) / 72.0;
-        // TextRenderer places the glyph ink with its top-left at (t.x, t.y)
+        auto  &t       = *static_cast<const Text *>(prim);
+        int    dpiX    = canvasHint ? canvasHint->dpi.x : 72;
+        int    dpiY    = canvasHint ? canvasHint->dpi.y : 72;
+        // TextRenderer lays out on a 96 DPI reference basis and scales the
+        // result by the canvas DPI, so a pt of type sits ~dpi/72 device px
+        // per axis (x/y independent for anisotropic DPI).
+        double pxSizeX = t.fontSize * static_cast<double>(dpiX) / 72.0;
+        double pxSizeY = t.fontSize * static_cast<double>(dpiY) / 72.0;
+        // TextRenderer places the layout ink with its top-left at (t.x, t.y)
         // and the ink extends downward/rightward, so the culling box must
-        // cover [t.y, t.y + inkH] — the old box (above t.y) let glyphs
-        // straddling a strip/tile boundary lose their lower half.
-        // Use generous estimates: ink width ≤ ~0.75em/char, ink height ≤ ~1.3em.
-        double estW = pxSize * 0.75 * t.content.length();
-        double estH = pxSize * 1.3;
-        xMin = t.x;
-        xMax = t.x + estW;
-        yMin = t.y;
-        yMax = t.y + estH;
+        // cover [t.y, t.y + inkH]. With width/height set, the ink fills the
+        // scaled target box but may exceed it slightly (italic overhang,
+        // descenders) — pad the far edges by ~0.3em. Without width/height,
+        // estimate the natural size: ≤ ~0.75em per char of the longest
+        // line, ≤ ~1.3em per explicit line.
+        double pad = std::max(pxSizeX, pxSizeY) * 0.3;
+        xMin       = t.x;
+        yMin       = t.y;
+        if (t.width > 0.0) {
+            xMax = t.x + t.width + pad;
+        } else {
+            size_t maxLen = 0, cur = 0;
+            for (char c : t.content) {
+                if (c == '\n') {
+                    maxLen = std::max(maxLen, cur);
+                    cur    = 0;
+                } else {
+                    ++cur;
+                }
+            }
+            maxLen = std::max(maxLen, cur);
+            xMax   = t.x + pxSizeX * 0.75 * static_cast<double>(maxLen) + pad;
+        }
+        if (t.height > 0.0) {
+            yMax = t.y + t.height + pad;
+        } else {
+            size_t lines = 1 + static_cast<size_t>(
+                                  std::count(t.content.begin(), t.content.end(), '\n'));
+            yMax = t.y + pxSizeY * 1.3 * static_cast<double>(lines) + pad;
+        }
         break;
     }
     case DrawType::IMAGE: {
@@ -189,10 +209,10 @@ DrawBBox SceneRenderer::computeBBox(DrawType type, const void *prim, const Canva
     if (xMax - xMin < 0 || yMax - yMin < 0)
         return bb;
 
-    bb.x0 = roundDn(xMin);
-    bb.y0 = roundDn(yMin);
-    bb.x1 = roundUp(xMax);
-    bb.y1 = roundUp(yMax);
+    bb.x0    = roundDn(xMin);
+    bb.y0    = roundDn(yMin);
+    bb.x1    = roundUp(xMax);
+    bb.y1    = roundUp(yMax);
     bb.valid = true;
     return bb;
 }
@@ -208,11 +228,11 @@ std::vector<SceneRenderer::DrawCall> SceneRenderer::buildDrawCalls(const Canvas 
                   + canvas.bezierCurves.size() + canvas.lines.size() + canvas.texts.size()
                   + canvas.images.size());
 
-#define PUSH_CALL(type, vec, primPtr)                        \
-    for (size_t i = 0; i < (vec).size(); ++i) {              \
-        DrawCall call{ (vec)[i].z, DrawType::type, i,        \
-            computeBBox(DrawType::type, primPtr, &canvas) }; \
-        calls.push_back(call);                               \
+#define PUSH_CALL(type, vec, primPtr)                                   \
+    for (size_t i = 0; i < (vec).size(); ++i) {                         \
+        DrawCall call{ (vec)[i].z, DrawType::type, i,                   \
+                       computeBBox(DrawType::type, primPtr, &canvas) }; \
+        calls.push_back(call);                                          \
     }
 
     PUSH_CALL(RECT, canvas.rects, &canvas.rects[i]);
@@ -224,8 +244,8 @@ std::vector<SceneRenderer::DrawCall> SceneRenderer::buildDrawCalls(const Canvas 
     PUSH_CALL(IMAGE, canvas.images, &canvas.images[i]);
 #undef PUSH_CALL
 
-    std::sort(
-        calls.begin(), calls.end(), [](const DrawCall &a, const DrawCall &b) { return a.z < b.z; });
+    std::sort(calls.begin(), calls.end(),
+              [](const DrawCall &a, const DrawCall &b) { return a.z < b.z; });
 
     return calls;
 }
@@ -235,7 +255,7 @@ std::vector<SceneRenderer::DrawCall> SceneRenderer::buildDrawCalls(const Canvas 
 // ============================================================
 
 void SceneRenderer::dispatchDraw(
-    DrawType type, size_t index, const Canvas &canvas, RenderContext &ctx, FontEngine *fe)
+    DrawType type, size_t index, const Canvas &canvas, RenderContext &ctx)
 {
     switch (type) {
     case DrawType::RECT:
@@ -254,7 +274,7 @@ void SceneRenderer::dispatchDraw(
         PathRenderer::drawLine(ctx, canvas.lines[index]);
         break;
     case DrawType::TEXT:
-        TextRenderer::draw(ctx, canvas.texts[index], fe, canvas.dpi);
+        TextRenderer::draw(ctx, canvas.texts[index], canvas.dpi);
         break;
     case DrawType::IMAGE:
         ImageRenderer::draw(ctx, canvas.images[index], canvas.dpi);
@@ -266,8 +286,9 @@ void SceneRenderer::dispatchDraw(
 //  Tile rendering — bbox-culled dispatch
 // ============================================================
 
-void SceneRenderer::renderTile(
-    const std::vector<DrawCall> &calls, const Canvas &canvas, RenderContext &ctx, FontEngine *fe)
+void SceneRenderer::renderTile(const std::vector<DrawCall> &calls,
+                               const Canvas                &canvas,
+                               RenderContext               &ctx)
 {
     int tx = ctx.tileX, ty = ctx.tileY, tw = ctx.tileW, th = ctx.tileH;
     if (tw <= 0) {
@@ -278,7 +299,7 @@ void SceneRenderer::renderTile(
     for (auto &call : calls) {
         if (!call.bbox.intersects(tx, ty, tw, th))
             continue;
-        dispatchDraw(call.type, call.index, canvas, ctx, fe);
+        dispatchDraw(call.type, call.index, canvas, ctx);
     }
 }
 
@@ -289,19 +310,19 @@ void SceneRenderer::renderTile(
 RenderResult SceneRenderer::render(const Canvas &canvas)
 {
     RenderResult result;
-    result.width = canvas.width;
+    result.width  = canvas.width;
     result.height = canvas.height;
 
     RenderContext ctx;
-    ctx.converter = m_converter;
-    ctx.resampler = m_resampler;
+    ctx.converter       = m_converter;
+    ctx.resampler       = m_resampler;
     ctx.samplesPerPixel = canvas.samplesPerPixel;
-    ctx.sampleInfo = canvas.sampleInfo;
+    ctx.sampleInfo      = canvas.sampleInfo;
     ctx.initFullCanvas(canvas.width, canvas.height);
     ctx.fillBackground(canvas.background);
 
     auto calls = buildDrawCalls(canvas);
-    renderTile(calls, canvas, ctx, m_fontEngine.get());
+    renderTile(calls, canvas, ctx);
 
     result.cmykBuf = std::move(ctx.cmykBuf);
     return result;
@@ -327,9 +348,9 @@ static void probeDecodeCost(const std::string &filePath, const ImageItem *img, u
 {
     uint64_t w = 0, h = 0, chans = 7;
     {
-        auto prevErr = TIFFSetErrorHandler(nullptr);
-        auto prevWarn = TIFFSetWarningHandler(nullptr);
-        TIFF *tif = TiffHelper::openTiff(filePath, "r");
+        auto  prevErr  = TIFFSetErrorHandler(nullptr);
+        auto  prevWarn = TIFFSetWarningHandler(nullptr);
+        TIFF *tif      = FileUtil::openTiff(filePath, "r");
         TIFFSetErrorHandler(prevErr);
         TIFFSetWarningHandler(prevWarn);
         if (tif) {
@@ -349,15 +370,15 @@ static void probeDecodeCost(const std::string &filePath, const ImageItem *img, u
         }
     }
     if (w == 0 || h == 0) {
-        VipsImage *vimg = vips_image_new_from_file(
-            filePath.c_str(), "access", VIPS_ACCESS_SEQUENTIAL, nullptr);
+        VipsImage *vimg =
+            vips_image_new_from_file(filePath.c_str(), "access", VIPS_ACCESS_SEQUENTIAL, nullptr);
         if (!vimg) {
             vips_error_clear();
             cost = 1;
             return;
         }
-        w = static_cast<uint64_t>(vips_image_get_width(vimg));
-        h = static_cast<uint64_t>(vips_image_get_height(vimg));
+        w           = static_cast<uint64_t>(vips_image_get_width(vimg));
+        h           = static_cast<uint64_t>(vips_image_get_height(vimg));
         auto interp = vips_image_get_interpretation(vimg);
         if (interp == VIPS_INTERPRETATION_CMYK)
             chans = 4;
@@ -401,8 +422,8 @@ void SceneRenderer::preDecodeImages(const Canvas &canvas, DecodeProgress progres
             if (!rect.textureFill || rect.textureFill->filePath.empty())
                 continue;
             const TextureFill &tf = *rect.textureFill;
-            int ow = tf.useOriginalSize ? 0 : static_cast<int>(tf.customWidth + 0.5);
-            int oh = tf.useOriginalSize ? 0 : static_cast<int>(tf.customHeight + 0.5);
+            int                ow = tf.useOriginalSize ? 0 : static_cast<int>(tf.customWidth + 0.5);
+            int         oh  = tf.useOriginalSize ? 0 : static_cast<int>(tf.customHeight + 0.5);
             std::string key = tf.filePath; // 缓存键仅按文件路径（见 Task 3 Step 4 要求 3）
             if (seen.insert(key).second)
                 textures.emplace_back(tf.filePath, ow, oh);
@@ -411,12 +432,16 @@ void SceneRenderer::preDecodeImages(const Canvas &canvas, DecodeProgress progres
 
     struct PredecodeItem
     {
-        enum class Kind { Image, Texture };
-        Kind kind;
-        const ImageItem *img = nullptr; // Kind::Image
-        std::string path;               // Kind::Texture
-        int ow = 0, oh = 0;             // 纹理 tile 尺寸覆盖
-        uint64_t cost = 0;
+        enum class Kind
+        {
+            Image,
+            Texture
+        };
+        Kind             kind;
+        const ImageItem *img = nullptr;  // Kind::Image
+        std::string      path;           // Kind::Texture
+        int              ow = 0, oh = 0; // 纹理 tile 尺寸覆盖
+        uint64_t         cost = 0;
     };
 
     std::vector<PredecodeItem> items;
@@ -444,7 +469,7 @@ void SceneRenderer::preDecodeImages(const Canvas &canvas, DecodeProgress progres
     // Items costing more than the budget run alone (serial) — peak memory
     // never exceeds one decode.
     constexpr uint64_t kDefaultBudgetBytes = 4ULL * 1024 * 1024 * 1024;
-    uint64_t budget = kDefaultBudgetBytes;
+    uint64_t           budget              = kDefaultBudgetBytes;
 
     unsigned nWorkers = std::thread::hardware_concurrency();
     if (nWorkers < 1)
@@ -493,12 +518,11 @@ void SceneRenderer::renderRow(const Canvas &canvas, RowCallback callback)
 {
     if (canvas.height <= 0)
         return;
-    renderStrip(canvas, 1,
-        [&](int startRow, int rows, std::vector<uint8_t> cmyk) {
-            // rowsPerStrip=1 → rows 恒为 1
-            (void)rows;
-            callback(startRow, std::move(cmyk));
-        });
+    renderStrip(canvas, 1, [&](int startRow, int rows, std::vector<uint8_t> cmyk) {
+        // rowsPerStrip=1 → rows 恒为 1
+        (void)rows;
+        callback(startRow, std::move(cmyk));
+    });
 }
 
 // ============================================================
@@ -510,8 +534,10 @@ void SceneRenderer::renderRow(const Canvas &canvas, RowCallback callback)
 //  caller never needs to hold the full frame in memory.
 // ============================================================
 
-void SceneRenderer::renderStrip(const Canvas &canvas, int rowsPerStrip, StripCallback callback,
-    bool ordered)
+void SceneRenderer::renderStrip(const Canvas &canvas,
+                                int           rowsPerStrip,
+                                StripCallback callback,
+                                bool          ordered)
 {
     if (rowsPerStrip <= 0) {
         // Fall back to full-canvas render as a single strip.
@@ -548,23 +574,19 @@ void SceneRenderer::renderStrip(const Canvas &canvas, int rowsPerStrip, StripCal
     // active memory stays a narrow vertical window (~band height × row width)
     // regardless of how large the whole resampled image would be.
     const size_t nStrips = strips.size();
-    size_t band = 0;
+    size_t       band    = 0;
     while (band < nStrips) {
-        const size_t bandEnd = std::min(nStrips, band + nWorkers);
+        const size_t   bandEnd = std::min(nStrips, band + nWorkers);
         const unsigned bandWorkers =
             static_cast<unsigned>(std::min(nWorkers, static_cast<unsigned>(bandEnd - band)));
 
         std::atomic<size_t> nextIdx{ band };
 
         auto worker = [&]() {
-            // Per-thread font engine + lcms2 converter clones — same
-            // thread-safety rationale as renderStrip/renderRow (FontEngine
-            // and cmsHTRANSFORM are not thread-safe).
-            auto threadFE = m_fontEngine->cloneForThread();
-            FontEngine *fe = threadFE ? threadFE.get() : nullptr;
-
+            // Per-thread lcms2 converter clone — cmsHTRANSFORM is not
+            // thread-safe, so each worker gets its own transform.
             auto threadConverter = m_converter ? m_converter->cloneForThread() : nullptr;
-            IColorConverter *cv = threadConverter ? threadConverter.get() : m_converter;
+            IColorConverter *cv  = threadConverter ? threadConverter.get() : m_converter;
 
             for (;;) {
                 const size_t idx = nextIdx.fetch_add(1);
@@ -577,14 +599,14 @@ void SceneRenderer::renderStrip(const Canvas &canvas, int rowsPerStrip, StripCal
                 // The private renderTile() helper does bbox-culled dispatch
                 // over any rectangular window, so it works for strips too.
                 RenderContext ctx;
-                ctx.converter = cv;
-                ctx.resampler = m_resampler;
+                ctx.converter       = cv;
+                ctx.resampler       = m_resampler;
                 ctx.samplesPerPixel = canvas.samplesPerPixel;
-                ctx.sampleInfo = canvas.sampleInfo;
+                ctx.sampleInfo      = canvas.sampleInfo;
                 ctx.initTile(canvas.width, canvas.height, 0, s.startRow, canvas.width, s.rows);
                 ctx.fillBackground(canvas.background);
 
-                renderTile(allCalls, canvas, ctx, fe);
+                renderTile(allCalls, canvas, ctx);
 
                 // Callback invoked from worker thread — caller must be
                 // thread-safe. ctx.cmykBuf is strip-local.

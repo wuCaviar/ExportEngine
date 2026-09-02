@@ -1,9 +1,9 @@
 #include "ImageRenderer.h"
 #include "IColorConverter.h"
 #include "IResampler.h"
-#include "NearestResampler.h"
+#include "VipsResampler.h"
 #include "Log.h"
-#include "TiffHelper.h"
+#include "FileUtil.h"
 #include "VipsUtil.h" // extractVipsImageDpi
 
 #include <tiffio.h>
@@ -25,9 +25,9 @@ namespace {
 // to bound memory in long-running processes.
 struct CappedFileSet
 {
-    static constexpr size_t kCap = 1024;
+    static constexpr size_t         kCap = 1024;
     std::unordered_set<std::string> files;
-    bool insert(const std::string &f)
+    bool                            insert(const std::string &f)
     {
         if (files.size() >= kCap)
             files.clear();
@@ -62,10 +62,10 @@ static void suppressVipsWarnings()
     std::call_once(s_once, [] {
         g_log_set_handler(
             "VIPS", G_LOG_LEVEL_WARNING,
-            [](const gchar *, GLogLevelFlags, const gchar *, gpointer) {}, nullptr);
+            [](const gchar *, GLogLevelFlags, const gchar *, gpointer) { }, nullptr);
         g_log_set_handler(
             "VIPS-VIPS", G_LOG_LEVEL_WARNING,
-            [](const gchar *, GLogLevelFlags, const gchar *, gpointer) {}, nullptr);
+            [](const gchar *, GLogLevelFlags, const gchar *, gpointer) { }, nullptr);
     });
 }
 
@@ -100,19 +100,25 @@ static bool hasExtension(const std::string &path, const char *extCmp)
         return false;
     std::string ext = path.substr(dotPos);
     std::transform(ext.begin(), ext.end(), ext.begin(),
-        [](unsigned char c) { return static_cast<char>(::tolower(c)); });
+                   [](unsigned char c) { return static_cast<char>(::tolower(c)); });
     return ext == extCmp;
 }
 
 /// Read TIFF metadata via libtiff (header tags only, zero pixel decode).
 /// When the TIFF embeds an ICC profile (RGB source), its bytes are copied
 /// into outIcc for use in the colourspace conversion.
-static bool readTiffMeta(const std::string &path, uint32_t &outW, uint32_t &outH, ImgType &outType,
-    int &outBpp, double &outDpiX, double &outDpiY, std::vector<uint8_t> &outIcc)
+static bool readTiffMeta(const std::string    &path,
+                         uint32_t             &outW,
+                         uint32_t             &outH,
+                         ImgType              &outType,
+                         int                  &outBpp,
+                         double               &outDpiX,
+                         double               &outDpiY,
+                         std::vector<uint8_t> &outIcc)
 {
-    auto prevErr = TIFFSetErrorHandler(nullptr);
-    auto prevWarn = TIFFSetWarningHandler(nullptr);
-    TIFF *tif = TiffHelper::openTiff(path, "r");
+    auto  prevErr  = TIFFSetErrorHandler(nullptr);
+    auto  prevWarn = TIFFSetWarningHandler(nullptr);
+    TIFF *tif      = FileUtil::openTiff(path, "r");
     TIFFSetErrorHandler(prevErr);
     TIFFSetWarningHandler(prevWarn);
     if (!tif)
@@ -125,12 +131,12 @@ static bool readTiffMeta(const std::string &path, uint32_t &outW, uint32_t &outH
     outH = h;
 
     // Embedded ICC profile (may be absent)
-    uint32_t iccLen = 0;
-    void *iccData = nullptr;
+    uint32_t iccLen  = 0;
+    void    *iccData = nullptr;
     outIcc.clear();
     if (TIFFGetField(tif, TIFFTAG_ICCPROFILE, &iccLen, &iccData) && iccLen > 0 && iccData)
-        outIcc.assign(
-            static_cast<const uint8_t *>(iccData), static_cast<const uint8_t *>(iccData) + iccLen);
+        outIcc.assign(static_cast<const uint8_t *>(iccData),
+                      static_cast<const uint8_t *>(iccData) + iccLen);
 
     uint16_t photo = 0, spp = 4;
     TIFFGetFieldDefaulted(tif, TIFFTAG_PHOTOMETRIC, &photo);
@@ -142,16 +148,16 @@ static bool readTiffMeta(const std::string &path, uint32_t &outW, uint32_t &outH
     // CMYK output).
     if (photo == PHOTOMETRIC_SEPARATED) {
         outType = ImgType::CMYK;
-        outBpp = spp;
+        outBpp  = spp;
     } else if (photo == PHOTOMETRIC_MINISBLACK || photo == PHOTOMETRIC_MINISWHITE) {
         outType = ImgType::Gray;
-        outBpp = spp; // usually 1; 2 = gray + alpha
+        outBpp  = spp; // usually 1; 2 = gray + alpha
     } else {
         outType = ImgType::RGB;
-        outBpp = spp; // 3 = RGB, 4 = RGBA
+        outBpp  = spp; // 3 = RGB, 4 = RGBA
     }
 
-    float xres = 72.0f, yres = 72.0f;
+    float    xres = 72.0f, yres = 72.0f;
     uint16_t resUnit = RESUNIT_INCH;
     TIFFGetFieldDefaulted(tif, TIFFTAG_XRESOLUTION, &xres);
     TIFFGetFieldDefaulted(tif, TIFFTAG_YRESOLUTION, &yres);
@@ -185,20 +191,29 @@ static inline int verticalNN(int oy, int srcH, int dstH)
 /// present (multi-channel TIFF pass-through), otherwise zero-padded.
 /// srcRow0 = source row number of the first row in src (chunk-relative
 /// blending — src may hold only a row range, not the whole frame).
-static void blendCmykRows(RenderContext &ctx, const uint8_t *src, int srcW, int srcSpp, int outX0,
-    int outX1, int outY0, int outY1, int imgX, int imgY, int srcRow0)
+static void blendCmykRows(RenderContext &ctx,
+                          const uint8_t *src,
+                          int            srcW,
+                          int            srcSpp,
+                          int            outX0,
+                          int            outX1,
+                          int            outY0,
+                          int            outY1,
+                          int            imgX,
+                          int            imgY,
+                          int            srcRow0)
 {
     for (int py = outY0; py < outY1; ++py) {
-        int srcRow = py - imgY - srcRow0;
+        int            srcRow = py - imgY - srcRow0;
         const uint8_t *rowBuf = src + static_cast<size_t>(srcRow) * srcW * srcSpp;
         for (int px = outX0; px < outX1; ++px) {
-            int srcPx = px - imgX;
-            const uint8_t *sp = rowBuf + static_cast<size_t>(srcPx) * srcSpp;
+            int            srcPx = px - imgX;
+            const uint8_t *sp    = rowBuf + static_cast<size_t>(srcPx) * srcSpp;
             ctx.blendCmyk(px, py, sp[0], sp[1], sp[2], sp[3], 255);
             // Extra channels: write if available, else zero-pad
             if (ctx.samplesPerPixel > 4) {
-                int lx = (ctx.tileW > 0) ? (px - ctx.tileX) : px;
-                int ly = (ctx.tileW > 0) ? (py - ctx.tileY) : py;
+                int    lx = (ctx.tileW > 0) ? (px - ctx.tileX) : px;
+                int    ly = (ctx.tileW > 0) ? (py - ctx.tileY) : py;
                 size_t dstIdx =
                     (static_cast<size_t>(ly) * ctx.effectiveWidth() + static_cast<size_t>(lx))
                     * ctx.samplesPerPixel;
@@ -227,8 +242,8 @@ struct RasterSource
 {
     virtual ~RasterSource() = default;
 
-    virtual int width() const = 0; // render target size (post-scale)
-    virtual int height() const = 0;
+    virtual int width() const           = 0; // render target size (post-scale)
+    virtual int height() const          = 0;
     virtual int samplesPerPixel() const = 0; // ≥4; first four channels are CMYK
     // Read rows [y0, y0+n) into out (out size = n * width() * samplesPerPixel()).
     // Returns false on failure (partial output invalid).
@@ -248,7 +263,8 @@ class TiffCmykSource : public RasterSource
 public:
     TiffCmykSource(std::string path, uint32_t srcW, uint32_t srcH, int srcBpp)
         : m_path(std::move(path)), m_w(srcW), m_h(srcH), m_spp(srcBpp)
-    { }
+    {
+    }
 
     int width() const override { return static_cast<int>(m_w); }
     int height() const override { return static_cast<int>(m_h); }
@@ -263,22 +279,23 @@ public:
         // 逐 strip 读（strip 级缓存），按行组装
         for (int r = 0; r < n; ++r) {
             uint32_t srcRow = static_cast<uint32_t>(y0 + r);
-            tstrip_t si = static_cast<tstrip_t>(srcRow) / m_rowsPerStrip;
+            tstrip_t si     = static_cast<tstrip_t>(srcRow) / m_rowsPerStrip;
             if (static_cast<int>(si) != m_cachedStrip) {
                 uint32_t sRows = m_rowsPerStrip;
                 if (si == m_nStrips - 1)
                     sRows = m_h - si * m_rowsPerStrip;
                 m_stripStartRow = si * m_rowsPerStrip;
                 m_stripBuf.resize(static_cast<size_t>(m_w) * sRows * m_spp);
-                if (TIFFReadEncodedStrip(
-                        m_tif, si, m_stripBuf.data(), static_cast<tsize_t>(m_stripBuf.size()))
+                if (TIFFReadEncodedStrip(m_tif, si, m_stripBuf.data(),
+                                         static_cast<tsize_t>(m_stripBuf.size()))
                     < 0)
                     return false;
                 m_cachedStrip = static_cast<int>(si);
             }
             std::memcpy(out.data() + static_cast<size_t>(r) * m_w * m_spp,
-                m_stripBuf.data() + static_cast<size_t>(srcRow - m_stripStartRow) * m_w * m_spp,
-                static_cast<size_t>(m_w) * m_spp);
+                        m_stripBuf.data()
+                            + static_cast<size_t>(srcRow - m_stripStartRow) * m_w * m_spp,
+                        static_cast<size_t>(m_w) * m_spp);
         }
         return true;
     }
@@ -295,9 +312,9 @@ private:
         if (m_tif)
             return true;
 
-        auto prevErr = TIFFSetErrorHandler(nullptr);
+        auto prevErr  = TIFFSetErrorHandler(nullptr);
         auto prevWarn = TIFFSetWarningHandler(nullptr);
-        m_tif = TiffHelper::openTiff(m_path, "r");
+        m_tif         = FileUtil::openTiff(m_path, "r");
         TIFFSetErrorHandler(prevErr);
         TIFFSetWarningHandler(prevWarn);
         if (!m_tif)
@@ -310,14 +327,14 @@ private:
         return true;
     }
 
-    std::string m_path;
-    uint32_t m_w = 0, m_h = 0;
-    int m_spp = 4;
-    TIFF *m_tif = nullptr;
-    uint32_t m_rowsPerStrip = 0;
-    tstrip_t m_nStrips = 0;
-    int m_cachedStrip = -1;
-    uint32_t m_stripStartRow = 0;
+    std::string          m_path;
+    uint32_t             m_w = 0, m_h = 0;
+    int                  m_spp           = 4;
+    TIFF                *m_tif           = nullptr;
+    uint32_t             m_rowsPerStrip  = 0;
+    tstrip_t             m_nStrips       = 0;
+    int                  m_cachedStrip   = -1;
+    uint32_t             m_stripStartRow = 0;
     std::vector<uint8_t> m_stripBuf;
 };
 
@@ -328,8 +345,13 @@ private:
 class TiffConvertSource : public RasterSource
 {
 public:
-    TiffConvertSource(std::string path, uint32_t srcW, uint32_t srcH, int srcBpp, ImgType imgType,
-        IColorConverter *cv, const std::vector<uint8_t> &srcIcc)
+    TiffConvertSource(std::string                 path,
+                      uint32_t                    srcW,
+                      uint32_t                    srcH,
+                      int                         srcBpp,
+                      ImgType                     imgType,
+                      IColorConverter            *cv,
+                      const std::vector<uint8_t> &srcIcc)
         : m_path(std::move(path)), m_w(srcW), m_h(srcH), m_srcBpp(srcBpp)
     {
         m_lcms = cv ? cv->makeToCmyk(toPixelSpace(imgType, srcBpp), srcIcc) : nullptr;
@@ -347,7 +369,7 @@ public:
         out.resize(static_cast<size_t>(n) * m_w * 4);
         for (int r = 0; r < n; ++r) {
             uint32_t srcRow = static_cast<uint32_t>(y0 + r);
-            tstrip_t si = static_cast<tstrip_t>(srcRow) / m_rowsPerStrip;
+            tstrip_t si     = static_cast<tstrip_t>(srcRow) / m_rowsPerStrip;
             if (static_cast<int>(si) != m_cachedStrip) {
                 uint32_t sRows = m_rowsPerStrip;
                 if (si == m_nStrips - 1)
@@ -356,8 +378,8 @@ public:
 
                 // Read raw strip via libtiff
                 m_rawBuf.resize(static_cast<size_t>(m_w) * sRows * m_srcBpp);
-                if (TIFFReadEncodedStrip(
-                        m_tif, si, m_rawBuf.data(), static_cast<tsize_t>(m_rawBuf.size()))
+                if (TIFFReadEncodedStrip(m_tif, si, m_rawBuf.data(),
+                                         static_cast<tsize_t>(m_rawBuf.size()))
                     < 0)
                     return false;
 
@@ -367,8 +389,8 @@ public:
                 m_cachedStrip = static_cast<int>(si);
             }
             std::memcpy(out.data() + static_cast<size_t>(r) * m_w * 4,
-                m_cmykBuf.data() + static_cast<size_t>(srcRow - m_stripStartRow) * m_w * 4,
-                static_cast<size_t>(m_w) * 4);
+                        m_cmykBuf.data() + static_cast<size_t>(srcRow - m_stripStartRow) * m_w * 4,
+                        static_cast<size_t>(m_w) * 4);
         }
         return true;
     }
@@ -385,9 +407,9 @@ private:
         if (m_tif)
             return true;
 
-        auto prevErr = TIFFSetErrorHandler(nullptr);
+        auto prevErr  = TIFFSetErrorHandler(nullptr);
         auto prevWarn = TIFFSetWarningHandler(nullptr);
-        m_tif = TiffHelper::openTiff(m_path, "r");
+        m_tif         = FileUtil::openTiff(m_path, "r");
         TIFFSetErrorHandler(prevErr);
         TIFFSetWarningHandler(prevWarn);
         if (!m_tif)
@@ -400,17 +422,17 @@ private:
         return true;
     }
 
-    std::string m_path;
-    uint32_t m_w = 0, m_h = 0;
-    int m_srcBpp = 4;
-    TIFF *m_tif = nullptr;
-    uint32_t m_rowsPerStrip = 0;
-    tstrip_t m_nStrips = 0;
+    std::string                      m_path;
+    uint32_t                         m_w = 0, m_h = 0;
+    int                              m_srcBpp       = 4;
+    TIFF                            *m_tif          = nullptr;
+    uint32_t                         m_rowsPerStrip = 0;
+    tstrip_t                         m_nStrips      = 0;
     std::unique_ptr<IColorTransform> m_lcms;
-    int m_cachedStrip = -1;
-    uint32_t m_stripStartRow = 0;
-    std::vector<uint8_t> m_rawBuf;
-    std::vector<uint8_t> m_cmykBuf;
+    int                              m_cachedStrip   = -1;
+    uint32_t                         m_stripStartRow = 0;
+    std::vector<uint8_t>             m_rawBuf;
+    std::vector<uint8_t>             m_cmykBuf;
 };
 
 // ── Decoded path (needs resize, or non-TIFF) ───────────────────────────
@@ -420,12 +442,26 @@ private:
 class DecodedSource : public RasterSource
 {
 public:
-    DecodedSource(std::string path, uint32_t srcW, uint32_t srcH, int srcBpp, ImgType imgType,
-        int renderW, int renderH, IColorConverter *cv, IResampler *resampler,
-        const std::vector<uint8_t> &srcIcc, VipsImage *vipsImg)
-        : m_path(std::move(path)), m_srcW(srcW), m_srcH(srcH), m_srcBpp(srcBpp),
-          m_imgType(imgType), m_w(renderW), m_h(renderH), m_resampler(resampler),
-          m_vipsImg(vipsImg)
+    DecodedSource(std::string                 path,
+                  uint32_t                    srcW,
+                  uint32_t                    srcH,
+                  int                         srcBpp,
+                  ImgType                     imgType,
+                  int                         renderW,
+                  int                         renderH,
+                  IColorConverter            *cv,
+                  IResampler                 *resampler,
+                  const std::vector<uint8_t> &srcIcc,
+                  VipsImage                  *vipsImg)
+        : m_path(std::move(path))
+        , m_srcW(srcW)
+        , m_srcH(srcH)
+        , m_srcBpp(srcBpp)
+        , m_imgType(imgType)
+        , m_w(renderW)
+        , m_h(renderH)
+        , m_resampler(resampler)
+        , m_vipsImg(vipsImg)
     {
         // 非 TIFF：先 cast/校验/灰抽（都是惰性 vips 节点，不解码），得到实际 band 数。
         if (m_vipsImg)
@@ -435,7 +471,7 @@ public:
             // TIFF 用 srcBpp；非 TIFF 用准备后的实际 band 数（RGB 3/4、Gray 1）。
             const int bandBpp = m_vipsImg ? ((imgType == ImgType::RGB) ? m_vipsBands : 1) : srcBpp;
             m_lcms = cv ? cv->makeToCmyk(toPixelSpace(imgType, bandBpp), srcIcc) : nullptr;
-            m_ok = m_lcms != nullptr;
+            m_ok   = m_lcms != nullptr;
             if (!m_ok)
                 EELog::warn("Cannot build source→CMYK transform for: {}", m_path);
         }
@@ -449,9 +485,9 @@ public:
             g_object_unref(m_vipsImg);
     }
 
-    int width() const override { return m_w; }
-    int height() const override { return m_h; }
-    int samplesPerPixel() const override { return 4; }
+    int  width() const override { return m_w; }
+    int  height() const override { return m_h; }
+    int  samplesPerPixel() const override { return 4; }
     bool ok() const override { return m_ok; }
 
     bool readRows(int y0, int n, std::vector<uint8_t> &out) override
@@ -461,9 +497,9 @@ public:
 
         // 覆盖输出行 [y0, y0+n) 的源行范围（含端点）
         const int srcH = static_cast<int>(m_srcH);
-        const int sy0 = verticalNN(y0, srcH, m_h);
-        const int sy1 = verticalNN(y0 + n - 1, srcH, m_h);
-        const int R = sy1 - sy0 + 1;
+        const int sy0  = verticalNN(y0, srcH, m_h);
+        const int sy1  = verticalNN(y0 + n - 1, srcH, m_h);
+        const int R    = sy1 - sy0 + 1;
 
         // 读源 band → CMYK（m_srcW × R × 4）
         m_cmyk.resize(static_cast<size_t>(m_srcW) * R * 4);
@@ -484,8 +520,8 @@ public:
         for (int r = 0; r < n; ++r) {
             const int sy = verticalNN(y0 + r, srcH, m_h) - sy0;
             std::memcpy(out.data() + static_cast<size_t>(r) * m_w * 4,
-                m_hBand.data() + static_cast<size_t>(sy) * m_w * 4,
-                static_cast<size_t>(m_w) * 4);
+                        m_hBand.data() + static_cast<size_t>(sy) * m_w * 4,
+                        static_cast<size_t>(m_w) * 4);
         }
         return true;
     }
@@ -496,7 +532,7 @@ private:
     bool prepareVips()
     {
         VipsImage *in = m_vipsImg;
-        m_vipsImg = nullptr;
+        m_vipsImg     = nullptr;
 
         if (vips_image_get_format(in) != VIPS_FORMAT_UCHAR) {
             VipsImage *cast = nullptr;
@@ -530,11 +566,11 @@ private:
                 return false;
             }
             g_object_unref(in);
-            in = gray;
+            in    = gray;
             bands = 1;
         }
 
-        m_vipsImg = in;
+        m_vipsImg   = in;
         m_vipsBands = bands;
         return true;
     }
@@ -547,7 +583,7 @@ private:
         cmykOut.resize(static_cast<size_t>(m_srcW) * rows * 4);
         for (int r = 0; r < rows; ++r) {
             const uint32_t srcRow = static_cast<uint32_t>(y0 + r);
-            const tstrip_t si = static_cast<tstrip_t>(srcRow) / m_rowsPerStrip;
+            const tstrip_t si     = static_cast<tstrip_t>(srcRow) / m_rowsPerStrip;
             if (static_cast<int>(si) != m_cachedStrip) {
                 uint32_t sRows = m_rowsPerStrip;
                 if (si == m_nStrips - 1)
@@ -555,16 +591,18 @@ private:
                 m_stripStartRow = si * m_rowsPerStrip;
                 m_rawBuf.resize(static_cast<size_t>(m_srcW) * sRows * m_srcBpp);
                 if (TIFFReadEncodedStrip(m_tif, si, m_rawBuf.data(),
-                        static_cast<tsize_t>(m_rawBuf.size())) < 0)
+                                         static_cast<tsize_t>(m_rawBuf.size()))
+                    < 0)
                     return false;
                 m_stripCmyk.resize(static_cast<size_t>(m_srcW) * sRows * 4);
                 convertToCmyk(m_rawBuf.data(), m_stripCmyk.data(),
-                    static_cast<int>(m_srcW * sRows));
+                              static_cast<int>(m_srcW * sRows));
                 m_cachedStrip = static_cast<int>(si);
             }
             std::memcpy(cmykOut.data() + static_cast<size_t>(r) * m_srcW * 4,
-                m_stripCmyk.data() + static_cast<size_t>(srcRow - m_stripStartRow) * m_srcW * 4,
-                static_cast<size_t>(m_srcW) * 4);
+                        m_stripCmyk.data()
+                            + static_cast<size_t>(srcRow - m_stripStartRow) * m_srcW * 4,
+                        static_cast<size_t>(m_srcW) * 4);
         }
         return true;
     }
@@ -575,15 +613,15 @@ private:
         const int w = static_cast<int>(m_srcW);
         cmykOut.resize(static_cast<size_t>(w) * rows * 4);
         VipsRegion *region = vips_region_new(m_vipsImg);
-        VipsRect rect = { 0, y0, w, rows };
+        VipsRect    rect   = { 0, y0, w, rows };
         if (vips_region_prepare(region, &rect)) {
             EELog::warn("Region read failed at row {}: {}", y0, vips_error_buffer());
             vips_error_clear();
             g_object_unref(region);
             return false;
         }
-        const uint8_t *band = reinterpret_cast<const uint8_t *>(VIPS_REGION_ADDR(region, 0, y0));
-        const size_t stride = VIPS_REGION_LSKIP(region);
+        const uint8_t *band   = reinterpret_cast<const uint8_t *>(VIPS_REGION_ADDR(region, 0, y0));
+        const size_t   stride = VIPS_REGION_LSKIP(region);
         if (m_imgType == ImgType::CMYK) {
             // 直通：取前 4 通道（可能带 stride）
             for (int r = 0; r < rows; ++r)
@@ -591,15 +629,15 @@ private:
                     for (int c = 0; c < 4; ++c)
                         cmykOut[(static_cast<size_t>(r) * w + x) * 4 + c] =
                             band[static_cast<size_t>(r) * stride
-                                + static_cast<size_t>(x) * m_vipsBands + c];
+                                 + static_cast<size_t>(x) * m_vipsBands + c];
         } else if (stride == static_cast<size_t>(w) * m_vipsBands) {
             m_lcms->convert(band, cmykOut.data(), w * rows);
         } else {
             m_rawBuf.resize(static_cast<size_t>(w) * rows * m_vipsBands);
             for (int r = 0; r < rows; ++r)
                 std::memcpy(m_rawBuf.data() + static_cast<size_t>(r) * w * m_vipsBands,
-                    band + static_cast<size_t>(r) * stride,
-                    static_cast<size_t>(w) * m_vipsBands);
+                            band + static_cast<size_t>(r) * stride,
+                            static_cast<size_t>(w) * m_vipsBands);
             m_lcms->convert(m_rawBuf.data(), cmykOut.data(), w * rows);
         }
         g_object_unref(region);
@@ -610,9 +648,9 @@ private:
     {
         if (m_tif)
             return true;
-        auto prevErr = TIFFSetErrorHandler(nullptr);
+        auto prevErr  = TIFFSetErrorHandler(nullptr);
         auto prevWarn = TIFFSetWarningHandler(nullptr);
-        m_tif = TiffHelper::openTiff(m_path, "r");
+        m_tif         = FileUtil::openTiff(m_path, "r");
         TIFFSetErrorHandler(prevErr);
         TIFFSetWarningHandler(prevWarn);
         if (!m_tif)
@@ -637,27 +675,27 @@ private:
         }
     }
 
-    std::string m_path;
-    uint32_t m_srcW = 0, m_srcH = 0;
-    int m_srcBpp = 4;
-    ImgType m_imgType = ImgType::RGB;
-    int m_w = 0, m_h = 0;
-    IResampler *m_resampler = nullptr;
+    std::string                      m_path;
+    uint32_t                         m_srcW = 0, m_srcH = 0;
+    int                              m_srcBpp  = 4;
+    ImgType                          m_imgType = ImgType::RGB;
+    int                              m_w = 0, m_h = 0;
+    IResampler                      *m_resampler = nullptr;
     std::unique_ptr<IColorTransform> m_lcms;
-    bool m_ok = true;
+    bool                             m_ok = true;
 
     // TIFF 懒加载状态
-    TIFF *m_tif = nullptr;
-    uint32_t m_rowsPerStrip = 0;
-    tstrip_t m_nStrips = 0;
-    int m_cachedStrip = -1;
-    uint32_t m_stripStartRow = 0;
+    TIFF                *m_tif           = nullptr;
+    uint32_t             m_rowsPerStrip  = 0;
+    tstrip_t             m_nStrips       = 0;
+    int                  m_cachedStrip   = -1;
+    uint32_t             m_stripStartRow = 0;
     std::vector<uint8_t> m_rawBuf;
     std::vector<uint8_t> m_stripCmyk;
 
     // 非 TIFF 状态（cast/校验后的源）
-    VipsImage *m_vipsImg = nullptr;
-    int m_vipsBands = 0;
+    VipsImage *m_vipsImg   = nullptr;
+    int        m_vipsBands = 0;
 
     // 读取暂存
     std::vector<uint8_t> m_cmyk;
@@ -670,12 +708,12 @@ private:
 //  Reads metadata (libtiff tags for TIFFs, vips header for others — zero
 //  pixel decode), computes the render size, and picks the cheapest source
 //  implementation. Returns nullptr on failure (with an error logged).
-static std::unique_ptr<RasterSource> openRasterSource(
-    const ImageItem &img, const Dpi &dpi, IColorConverter *cv, IResampler *resampler)
+static std::unique_ptr<RasterSource>
+openRasterSource(const ImageItem &img, const Dpi &dpi, IColorConverter *cv, IResampler *resampler)
 {
     // resampler 为空时回退到默认最近邻（直接调用 ImageRenderer::draw/preDecode
     // 的宿主未注入服务时仍可用）。
-    static NearestResampler s_defaultResampler;
+    static VipsResampler s_defaultResampler;
     if (!resampler)
         resampler = &s_defaultResampler;
 
@@ -683,16 +721,16 @@ static std::unique_ptr<RasterSource> openRasterSource(
     bool isTiff = hasExtension(img.filePath, ".tif") || hasExtension(img.filePath, ".tiff");
 
     // 2. Read metadata
-    uint32_t srcW = 0, srcH = 0;
-    ImgType imgType = ImgType::RGB;
-    int srcBpp = 4;
-    double imgDpiX = 72.0, imgDpiY = 72.0;
-    VipsImage *vipsImg = nullptr; // only used for non-TIFF or full-image paths
-    std::vector<uint8_t> srcIcc; // embedded ICC of the source (RGB/Gray)
+    uint32_t             srcW = 0, srcH = 0;
+    ImgType              imgType = ImgType::RGB;
+    int                  srcBpp  = 4;
+    double               imgDpiX = 72.0, imgDpiY = 72.0;
+    VipsImage           *vipsImg = nullptr; // only used for non-TIFF or full-image paths
+    std::vector<uint8_t> srcIcc;            // embedded ICC of the source (RGB/Gray)
 
     if (isTiff) {
         if (!readTiffMeta(img.filePath, srcW, srcH, imgType, srcBpp, imgDpiX, imgDpiY, srcIcc)) {
-            static CappedFileSet badFiles;
+            static CappedFileSet        badFiles;
             std::lock_guard<std::mutex> lock(g_warnMutex);
             if (badFiles.insert(img.filePath))
                 EELog::warn("Cannot open image: {}", img.filePath);
@@ -701,10 +739,10 @@ static std::unique_ptr<RasterSource> openRasterSource(
     } else {
         // RANDOM：DecodedSource 现在惰性按需读行（渲染 strip 可能乱序/多线程），
         // SEQUENTIAL 会在每个 strip 重新从顶部解码到请求行，代价 O(n²)。
-        vipsImg = vips_image_new_from_file(
-            img.filePath.c_str(), "access", VIPS_ACCESS_RANDOM, nullptr);
+        vipsImg =
+            vips_image_new_from_file(img.filePath.c_str(), "access", VIPS_ACCESS_RANDOM, nullptr);
         if (!vipsImg) {
-            static CappedFileSet badFiles;
+            static CappedFileSet        badFiles;
             std::lock_guard<std::mutex> lock(g_warnMutex);
             if (badFiles.insert(img.filePath))
                 EELog::warn("Cannot open image: {} — {}", img.filePath, vips_error_buffer());
@@ -715,7 +753,7 @@ static std::unique_ptr<RasterSource> openRasterSource(
         int sw = vips_image_get_width(vipsImg);
         int sh = vips_image_get_height(vipsImg);
         if (sw <= 0 || sh <= 0) {
-            static CappedFileSet dimFiles;
+            static CappedFileSet        dimFiles;
             std::lock_guard<std::mutex> lock(g_warnMutex);
             if (dimFiles.insert(img.filePath))
                 EELog::warn("Invalid dimensions ({}x{}): {}", sw, sh, img.filePath);
@@ -725,35 +763,35 @@ static std::unique_ptr<RasterSource> openRasterSource(
         srcW = static_cast<uint32_t>(sw);
         srcH = static_cast<uint32_t>(sh);
 
-        imgType = classifyVipsImage(vipsImg);
+        imgType             = classifyVipsImage(vipsImg);
         const int vipsBands = vips_image_get_bands(vipsImg);
         if (imgType == ImgType::CMYK)
             srcBpp = vipsBands;
         else if (imgType == ImgType::Gray)
-            srcBpp = 1; // gray(+alpha) → 抽 band 0 → 1 通道
+            srcBpp = 1;         // gray(+alpha) → 抽 band 0 → 1 通道
         else
             srcBpp = vipsBands; // RGB：实际 3 或 4 通道
 
         auto [dpiX, dpiY] = extractVipsImageDpi(vipsImg);
-        imgDpiX = dpiX;
-        imgDpiY = dpiY;
+        imgDpiX           = dpiX;
+        imgDpiY           = dpiY;
 
         // Embedded ICC (JPEG/PNG/…) — preferred source profile for lcms2.
         // vips exposes it as a header blob; copy it now (borrowed pointer).
         {
             const void *iccData = nullptr;
-            size_t iccLen = 0;
+            size_t      iccLen  = 0;
             if (vips_image_get_blob(vipsImg, VIPS_META_ICC_NAME, &iccData, &iccLen) == 0 && iccData
                 && iccLen > 0) {
                 srcIcc.assign(static_cast<const uint8_t *>(iccData),
-                    static_cast<const uint8_t *>(iccData) + iccLen);
+                              static_cast<const uint8_t *>(iccData) + iccLen);
             }
         }
     }
 
     // 3. Size guard
     if (srcW == 0 || srcH == 0 || srcW > 65535 || srcH > 65535) {
-        static CappedFileSet dimFiles;
+        static CappedFileSet        dimFiles;
         std::lock_guard<std::mutex> lock(g_warnMutex);
         if (dimFiles.insert(img.filePath))
             EELog::warn("Invalid dimensions ({}x{}): {}", srcW, srcH, img.filePath);
@@ -771,13 +809,13 @@ static std::unique_ptr<RasterSource> openRasterSource(
         renderW = static_cast<int>(img.width + 0.5);
         renderH = static_cast<int>(img.height + 0.5);
     } else if (img.width > 0) {
-        renderW = static_cast<int>(img.width + 0.5);
+        renderW       = static_cast<int>(img.width + 0.5);
         double aspect = static_cast<double>(srcH) / static_cast<double>(srcW);
-        renderH = static_cast<int>(renderW * aspect + 0.5);
+        renderH       = static_cast<int>(renderW * aspect + 0.5);
     } else if (img.height > 0) {
-        renderH = static_cast<int>(img.height + 0.5);
+        renderH       = static_cast<int>(img.height + 0.5);
         double aspect = static_cast<double>(srcW) / static_cast<double>(srcH);
-        renderW = static_cast<int>(renderH * aspect + 0.5);
+        renderW       = static_cast<int>(renderH * aspect + 0.5);
     } else {
         renderW = static_cast<int>(srcW * dpiScaleX + 0.5);
         renderH = static_cast<int>(srcH * dpiScaleY + 0.5);
@@ -792,15 +830,16 @@ static std::unique_ptr<RasterSource> openRasterSource(
 
     // 5. Log once per source
     {
-        static CappedFileSet logged;
+        static CappedFileSet        logged;
         std::lock_guard<std::mutex> lock(g_warnMutex);
         if (logged.insert(img.filePath)) {
             const char *typeLabel = imgType == ImgType::CMYK  ? "CMYK"
                                     : imgType == ImgType::RGB ? "RGB"
                                                               : "Gray";
             EELog::info("  [{}] {}×{} @ ~{:.0f}×{:.0f} DPI -> {}×{} px{}, pos ({},{})", typeLabel,
-                srcW, srcH, imgDpiX, imgDpiY, renderW, renderH, needsResize ? " [SCALE]" : "",
-                static_cast<int>(img.x + 0.5), static_cast<int>(img.y + 0.5));
+                        srcW, srcH, imgDpiX, imgDpiY, renderW, renderH,
+                        needsResize ? " [SCALE]" : "", static_cast<int>(img.x + 0.5),
+                        static_cast<int>(img.y + 0.5));
         }
     }
 
@@ -808,10 +847,11 @@ static std::unique_ptr<RasterSource> openRasterSource(
     if (isTiff && !needsResize && imgType == ImgType::CMYK)
         return std::make_unique<TiffCmykSource>(img.filePath, srcW, srcH, srcBpp);
     if (isTiff && !needsResize) // RGB/Gray TIFF: strip streaming + lcms2
-        return std::make_unique<TiffConvertSource>(
-            img.filePath, srcW, srcH, srcBpp, imgType, cv, srcIcc);
-    auto decoded = std::make_unique<DecodedSource>(img.filePath, srcW, srcH, srcBpp, imgType,
-        renderW, renderH, cv, resampler, srcIcc, vipsImg);
+        return std::make_unique<TiffConvertSource>(img.filePath, srcW, srcH, srcBpp, imgType, cv,
+                                                   srcIcc);
+    auto decoded =
+        std::make_unique<DecodedSource>(img.filePath, srcW, srcH, srcBpp, imgType, renderW, renderH,
+                                        cv, resampler, srcIcc, vipsImg);
     if (!decoded->ok())
         return nullptr; // 转换句柄构建失败（构造器已记录具体原因）
     return decoded;
@@ -845,10 +885,10 @@ void ImageRenderer::draw(RenderContext &ctx, const ImageItem &img, const Dpi &dp
     }
 
     // Clip against the tile/canvas region
-    int renderW = src->width();
-    int renderH = src->height();
-    int imgX = static_cast<int>(img.x + 0.5);
-    int imgY = static_cast<int>(img.y + 0.5);
+    int renderW  = src->width();
+    int renderH  = src->height();
+    int imgX     = static_cast<int>(img.x + 0.5);
+    int imgY     = static_cast<int>(img.y + 0.5);
     int canvasX0 = (ctx.tileW > 0) ? ctx.tileX : 0;
     int canvasY0 = (ctx.tileW > 0) ? ctx.tileY : 0;
     int canvasX1 = (ctx.tileW > 0) ? ctx.tileX + ctx.tileW : ctx.canvasWidth;
@@ -866,10 +906,10 @@ void ImageRenderer::draw(RenderContext &ctx, const ImageItem &img, const Dpi &dp
     const int spp = src->samplesPerPixel();
 
     // Read + blend in row chunks; sources stream internally (strip-level)
-    constexpr int kRowChunk = 128;
+    constexpr int        kRowChunk = 128;
     std::vector<uint8_t> rows;
     for (int y0 = outY0; y0 < outY1; y0 += kRowChunk) {
-        int n = std::min(kRowChunk, outY1 - y0);
+        int n    = std::min(kRowChunk, outY1 - y0);
         int srcY = y0 - imgY;
         if (!src->readRows(srcY, n, rows)) {
             std::lock_guard<std::mutex> lock(g_warnMutex);
@@ -888,8 +928,10 @@ void ImageRenderer::draw(RenderContext &ctx, const ImageItem &img, const Dpi &dp
 //  is nothing to warm and no full frame to force-read. preDecode only probes
 //  the header/transform so unreadable or unconvertible files are marked bad
 //  once, up front (shared g_badFiles) — the render pass then skips them.
-bool ImageRenderer::preDecode(
-    const ImageItem &img, const Dpi &dpi, IColorConverter *cv, IResampler *resampler)
+bool ImageRenderer::preDecode(const ImageItem &img,
+                              const Dpi       &dpi,
+                              IColorConverter *cv,
+                              IResampler      *resampler)
 {
     if (img.filePath.empty())
         return true;

@@ -2,7 +2,7 @@
 #include "IColorConverter.h"
 #include "Log.h"
 #include "VipsUtil.h" // extractVipsImageDpi
-#include "TiffHelper.h"
+#include "FileUtil.h"
 
 #include <tiffio.h>
 #include <vips/vips.h>
@@ -14,10 +14,10 @@
 
 using namespace ATHC::EE;
 
-std::mutex TextureSource::s_mtx;
+std::mutex                                                  TextureSource::s_mtx;
 std::unordered_map<std::string, TextureSource::CachedFrame> TextureSource::s_cache;
-std::unordered_set<std::string> TextureSource::s_badFiles;
-std::unordered_set<std::string> TextureSource::s_warned;
+std::unordered_set<std::string>                             TextureSource::s_badFiles;
+std::unordered_set<std::string>                             TextureSource::s_warned;
 
 namespace {
 
@@ -27,7 +27,7 @@ constexpr size_t kMaxWarned = 1024;
 // 帧每像素通道数：C、M、Y、K、A 共 5 通道。
 // （brief 注释里的 "×4" 与 sample() 的 5 分量 CMYK+A 输出矛盾——
 // 唯一自洽的布局是 5 字节/像素，sample 步长为 5。）
-constexpr int kChannelsPerPixel = 5;
+constexpr int    kChannelsPerPixel  = 5;
 constexpr size_t kChannelsPerPixelS = 5;
 
 // 一次性抑制 vips/GLib 的 stderr 警告（仿 ImageRenderer.cpp）。
@@ -37,10 +37,10 @@ static void suppressVipsWarnings()
     std::call_once(s_once, [] {
         g_log_set_handler(
             "VIPS", G_LOG_LEVEL_WARNING,
-            [](const gchar *, GLogLevelFlags, const gchar *, gpointer) {}, nullptr);
+            [](const gchar *, GLogLevelFlags, const gchar *, gpointer) { }, nullptr);
         g_log_set_handler(
             "VIPS-VIPS", G_LOG_LEVEL_WARNING,
-            [](const gchar *, GLogLevelFlags, const gchar *, gpointer) {}, nullptr);
+            [](const gchar *, GLogLevelFlags, const gchar *, gpointer) { }, nullptr);
     });
 }
 
@@ -52,7 +52,7 @@ static bool hasExtension(const std::string &path, const char *extCmp)
         return false;
     std::string ext = path.substr(dotPos);
     std::transform(ext.begin(), ext.end(), ext.begin(),
-        [](unsigned char c) { return static_cast<char>(::tolower(c)); });
+                   [](unsigned char c) { return static_cast<char>(::tolower(c)); });
     return ext == extCmp;
 }
 
@@ -65,12 +65,12 @@ static bool isTiffPath(const std::string &path)
 //    DecodedSource libtiff 读取方式）→ 5 通道 CMYKA 帧。RGB/灰源经
 //    lcms2 转换（对齐 ImageRenderer），lcms 不可用即失败（不降级）。
 //    返回 nullptr 表示失败。
-std::shared_ptr<std::vector<uint8_t>> decodeTiffFrame(
-    const std::string &path, IColorConverter *cv, uint32_t w, uint32_t h)
+std::shared_ptr<std::vector<uint8_t>>
+decodeTiffFrame(const std::string &path, IColorConverter *cv, uint32_t w, uint32_t h)
 {
-    auto prevErr = TIFFSetErrorHandler(nullptr);
-    auto prevWarn = TIFFSetWarningHandler(nullptr);
-    TIFF *tif = TiffHelper::openTiff(path, "r");
+    auto  prevErr  = TIFFSetErrorHandler(nullptr);
+    auto  prevWarn = TIFFSetWarningHandler(nullptr);
+    TIFF *tif      = FileUtil::openTiff(path, "r");
     TIFFSetErrorHandler(prevErr);
     TIFFSetWarningHandler(prevWarn);
     if (!tif)
@@ -84,23 +84,23 @@ std::shared_ptr<std::vector<uint8_t>> decodeTiffFrame(
     // readTiffMeta 相同读取方式）
     std::vector<uint8_t> iccBytes;
     {
-        uint32_t iccLen = 0;
-        void *iccData = nullptr;
+        uint32_t iccLen  = 0;
+        void    *iccData = nullptr;
         if (TIFFGetField(tif, TIFFTAG_ICCPROFILE, &iccLen, &iccData) && iccLen > 0 && iccData)
             iccBytes.assign(static_cast<const uint8_t *>(iccData),
-                static_cast<const uint8_t *>(iccData) + iccLen);
+                            static_cast<const uint8_t *>(iccData) + iccLen);
     }
 
     // EXTRASAMPLES 首项为 alpha 类型（ASSOCALPHA/UNASSALPHA）时保留 alpha 通道。
     // 只凭 extrasamples 标记判定——绝不只凭通道数推断 alpha；各 photometric
     // 分支再按自身通道布局决定 alpha 字节偏移（RGB spp=4/5 → 偏移 3；灰 spp=2
     // → 偏移 1；CMYK spp=5 → 偏移 4），因此 hasAlpha 在各分支内按 spp 收紧。
-    uint16_t extraCount = 0;
+    uint16_t  extraCount = 0;
     uint16_t *extraTypes = nullptr;
     TIFFGetFieldDefaulted(tif, TIFFTAG_EXTRASAMPLES, &extraCount, &extraTypes);
-    const bool extrasAlpha = (extraCount >= 1 && extraTypes
-                              && (extraTypes[0] == EXTRASAMPLE_ASSOCALPHA
-                                  || extraTypes[0] == EXTRASAMPLE_UNASSALPHA));
+    const bool extrasAlpha =
+        (extraCount >= 1 && extraTypes
+         && (extraTypes[0] == EXTRASAMPLE_ASSOCALPHA || extraTypes[0] == EXTRASAMPLE_UNASSALPHA));
 
     uint32_t rowsPerStrip = 0;
     TIFFGetFieldDefaulted(tif, TIFFTAG_ROWSPERSTRIP, &rowsPerStrip);
@@ -108,12 +108,12 @@ std::shared_ptr<std::vector<uint8_t>> decodeTiffFrame(
         rowsPerStrip = h;
     tstrip_t nStrips = TIFFNumberOfStrips(tif);
 
-    auto raw = std::make_shared<std::vector<uint8_t>>(static_cast<size_t>(w) * h * spp);
+    auto raw    = std::make_shared<std::vector<uint8_t>>(static_cast<size_t>(w) * h * spp);
     bool readOk = true;
     for (tstrip_t si = 0; si < nStrips; ++si) {
-        uint32_t sRows = (si == nStrips - 1) ? (h - si * rowsPerStrip) : rowsPerStrip;
-        size_t stripBytes = static_cast<size_t>(w) * sRows * spp;
-        size_t offset = static_cast<size_t>(w) * si * rowsPerStrip * spp;
+        uint32_t sRows      = (si == nStrips - 1) ? (h - si * rowsPerStrip) : rowsPerStrip;
+        size_t   stripBytes = static_cast<size_t>(w) * sRows * spp;
+        size_t   offset     = static_cast<size_t>(w) * si * rowsPerStrip * spp;
         if (TIFFReadEncodedStrip(tif, si, raw->data() + offset, static_cast<tsize_t>(stripBytes))
             < 0) {
             readOk = false;
@@ -125,7 +125,7 @@ std::shared_ptr<std::vector<uint8_t>> decodeTiffFrame(
         return nullptr;
 
     const size_t nPixels = static_cast<size_t>(w) * h;
-    auto frame = std::make_shared<std::vector<uint8_t>>(nPixels * kChannelsPerPixelS);
+    auto         frame   = std::make_shared<std::vector<uint8_t>>(nPixels * kChannelsPerPixelS);
 
     switch (photo) {
     case PHOTOMETRIC_SEPARATED: { // CMYK（spp=4）或 CMYKA（spp=5）
@@ -134,12 +134,12 @@ std::shared_ptr<std::vector<uint8_t>> decodeTiffFrame(
         const bool hasAlpha = extrasAlpha && spp == 5; // alpha 在偏移 4
         for (size_t i = 0; i < nPixels; ++i) {
             const uint8_t *s = raw->data() + i * spp;
-            uint8_t *d = frame->data() + i * kChannelsPerPixelS;
-            d[0] = s[0];
-            d[1] = s[1];
-            d[2] = s[2];
-            d[3] = s[3];
-            d[4] = hasAlpha ? s[4] : 255;
+            uint8_t       *d = frame->data() + i * kChannelsPerPixelS;
+            d[0]             = s[0];
+            d[1]             = s[1];
+            d[2]             = s[2];
+            d[3]             = s[3];
+            d[4]             = hasAlpha ? s[4] : 255;
         }
         break;
     }
@@ -161,11 +161,11 @@ std::shared_ptr<std::vector<uint8_t>> decodeTiffFrame(
         lcms->convert(rgb.data(), cmyk.data(), static_cast<int>(nPixels));
         for (size_t i = 0; i < nPixels; ++i) {
             uint8_t *d = frame->data() + i * kChannelsPerPixelS;
-            d[0] = cmyk[i * 4];
-            d[1] = cmyk[i * 4 + 1];
-            d[2] = cmyk[i * 4 + 2];
-            d[3] = cmyk[i * 4 + 3];
-            d[4] = hasAlpha ? raw->data()[i * spp + 3] : 255;
+            d[0]       = cmyk[i * 4];
+            d[1]       = cmyk[i * 4 + 1];
+            d[2]       = cmyk[i * 4 + 2];
+            d[3]       = cmyk[i * 4 + 3];
+            d[4]       = hasAlpha ? raw->data()[i * spp + 3] : 255;
         }
         break;
     }
@@ -186,11 +186,11 @@ std::shared_ptr<std::vector<uint8_t>> decodeTiffFrame(
         lcms->convert(gray.data(), cmyk.data(), static_cast<int>(nPixels));
         for (size_t i = 0; i < nPixels; ++i) {
             uint8_t *d = frame->data() + i * kChannelsPerPixelS;
-            d[0] = cmyk[i * 4];
-            d[1] = cmyk[i * 4 + 1];
-            d[2] = cmyk[i * 4 + 2];
-            d[3] = cmyk[i * 4 + 3];
-            d[4] = hasAlpha ? raw->data()[i * spp + 1] : 255;
+            d[0]       = cmyk[i * 4];
+            d[1]       = cmyk[i * 4 + 1];
+            d[2]       = cmyk[i * 4 + 2];
+            d[3]       = cmyk[i * 4 + 3];
+            d[4]       = hasAlpha ? raw->data()[i * spp + 1] : 255;
         }
         break;
     }
@@ -208,8 +208,8 @@ std::shared_ptr<std::vector<uint8_t>> decodeTiffFrame(
 //    - 其余解释（LAB/XYZ/scRGB…）或异常 band 数 → 解码失败
 //    （不再有 vips_colourspace→sRGB 兜底，与图片图元一致：失败即失败）。
 //    返回 nullptr 表示失败。
-std::shared_ptr<std::vector<uint8_t>> decodeVipsFrame(
-    const std::string &path, IColorConverter *cv, uint32_t w, uint32_t h)
+std::shared_ptr<std::vector<uint8_t>>
+decodeVipsFrame(const std::string &path, IColorConverter *cv, uint32_t w, uint32_t h)
 {
     suppressVipsWarnings();
 
@@ -224,11 +224,11 @@ std::shared_ptr<std::vector<uint8_t>> decodeVipsFrame(
     std::vector<uint8_t> iccBytes;
     {
         const void *iccData = nullptr;
-        size_t iccLen = 0;
+        size_t      iccLen  = 0;
         if (vips_image_get_blob(img, VIPS_META_ICC_NAME, &iccData, &iccLen) == 0 && iccData
             && iccLen > 0)
             iccBytes.assign(static_cast<const uint8_t *>(iccData),
-                static_cast<const uint8_t *>(iccData) + iccLen);
+                            static_cast<const uint8_t *>(iccData) + iccLen);
     }
 
     // 8-bit 要求：16-bit 源先降到 UCHAR（与图片图元 DecodedSource 的 cast
@@ -248,7 +248,7 @@ std::shared_ptr<std::vector<uint8_t>> decodeVipsFrame(
     // 分类处理，颜色转换仅 lcms2；不支持的解释直接失败，不再有
     // vips_colourspace→sRGB 兜底。
     const auto interp = vips_image_get_interpretation(img);
-    const int bands = vips_image_get_bands(img);
+    const int  bands  = vips_image_get_bands(img);
 
     // CMYK（spp=4）或 CMYKA（spp=5）→ 直通（像素即 CMYK，alpha 直拷）
     if (interp == VIPS_INTERPRETATION_CMYK) {
@@ -258,8 +258,8 @@ std::shared_ptr<std::vector<uint8_t>> decodeVipsFrame(
             return nullptr;
         }
         const bool hasAlpha = bands == 5; // alpha 在偏移 4
-        size_t rawSize = 0;
-        void *raw = vips_image_write_to_memory(img, &rawSize);
+        size_t     rawSize  = 0;
+        void      *raw      = vips_image_write_to_memory(img, &rawSize);
         g_object_unref(img);
         if (!raw) {
             vips_error_clear();
@@ -271,17 +271,17 @@ std::shared_ptr<std::vector<uint8_t>> decodeVipsFrame(
             g_free(raw);
             return nullptr;
         }
-        const uint8_t *px = static_cast<const uint8_t *>(raw);
-        const size_t nPixels = static_cast<size_t>(w) * h;
-        auto frame = std::make_shared<std::vector<uint8_t>>(nPixels * kChannelsPerPixelS);
+        const uint8_t *px      = static_cast<const uint8_t *>(raw);
+        const size_t   nPixels = static_cast<size_t>(w) * h;
+        auto           frame = std::make_shared<std::vector<uint8_t>>(nPixels * kChannelsPerPixelS);
         for (size_t i = 0; i < nPixels; ++i) {
             const uint8_t *s = px + i * bands;
-            uint8_t *d = frame->data() + i * kChannelsPerPixelS;
-            d[0] = s[0];
-            d[1] = s[1];
-            d[2] = s[2];
-            d[3] = s[3];
-            d[4] = hasAlpha ? s[4] : 255;
+            uint8_t       *d = frame->data() + i * kChannelsPerPixelS;
+            d[0]             = s[0];
+            d[1]             = s[1];
+            d[2]             = s[2];
+            d[3]             = s[3];
+            d[4]             = hasAlpha ? s[4] : 255;
         }
         g_free(raw);
         return frame;
@@ -296,8 +296,8 @@ std::shared_ptr<std::vector<uint8_t>> decodeVipsFrame(
             return nullptr;
         }
         const bool hasAlpha = bands == 2;
-        size_t rawSize = 0;
-        void *raw = vips_image_write_to_memory(img, &rawSize);
+        size_t     rawSize  = 0;
+        void      *raw      = vips_image_write_to_memory(img, &rawSize);
         g_object_unref(img);
         if (!raw) {
             vips_error_clear();
@@ -309,8 +309,8 @@ std::shared_ptr<std::vector<uint8_t>> decodeVipsFrame(
             g_free(raw);
             return nullptr;
         }
-        const uint8_t *px = static_cast<const uint8_t *>(raw);
-        const size_t nPixels = static_cast<size_t>(w) * h;
+        const uint8_t       *px      = static_cast<const uint8_t *>(raw);
+        const size_t         nPixels = static_cast<size_t>(w) * h;
         std::vector<uint8_t> gray(nPixels);
         for (size_t i = 0; i < nPixels; ++i)
             gray[i] = px[i * bands];
@@ -325,11 +325,11 @@ std::shared_ptr<std::vector<uint8_t>> decodeVipsFrame(
         auto frame = std::make_shared<std::vector<uint8_t>>(nPixels * kChannelsPerPixelS);
         for (size_t i = 0; i < nPixels; ++i) {
             uint8_t *d = frame->data() + i * kChannelsPerPixelS;
-            d[0] = cmyk[i * 4];
-            d[1] = cmyk[i * 4 + 1];
-            d[2] = cmyk[i * 4 + 2];
-            d[3] = cmyk[i * 4 + 3];
-            d[4] = hasAlpha ? px[i * bands + 1] : 255;
+            d[0]       = cmyk[i * 4];
+            d[1]       = cmyk[i * 4 + 1];
+            d[2]       = cmyk[i * 4 + 2];
+            d[3]       = cmyk[i * 4 + 3];
+            d[4]       = hasAlpha ? px[i * bands + 1] : 255;
         }
         g_free(raw);
         return frame;
@@ -339,7 +339,7 @@ std::shared_ptr<std::vector<uint8_t>> decodeVipsFrame(
     if ((interp == VIPS_INTERPRETATION_sRGB || interp == VIPS_INTERPRETATION_RGB)
         && (bands == 3 || bands == 4)) {
         size_t rawSize = 0;
-        void *raw = vips_image_write_to_memory(img, &rawSize);
+        void  *raw     = vips_image_write_to_memory(img, &rawSize);
         g_object_unref(img);
         if (!raw) {
             vips_error_clear();
@@ -351,11 +351,11 @@ std::shared_ptr<std::vector<uint8_t>> decodeVipsFrame(
             g_free(raw);
             return nullptr;
         }
-        const uint8_t *px = static_cast<const uint8_t *>(raw);
-        const size_t nPixels = static_cast<size_t>(w) * h;
-        std::unique_ptr<IColorTransform> lcms = cv
-            ? cv->makeToCmyk(bands == 4 ? PixelColorSpace::Rgba : PixelColorSpace::Rgb, iccBytes)
-            : nullptr;
+        const uint8_t                   *px      = static_cast<const uint8_t *>(raw);
+        const size_t                     nPixels = static_cast<size_t>(w) * h;
+        std::unique_ptr<IColorTransform> lcms =
+            cv ? cv->makeToCmyk(bands == 4 ? PixelColorSpace::Rgba : PixelColorSpace::Rgb, iccBytes)
+               : nullptr;
         if (!lcms) {
             g_free(raw);
             return nullptr; // 与图片图元一致：lcms 不可用 → 解码失败
@@ -365,11 +365,11 @@ std::shared_ptr<std::vector<uint8_t>> decodeVipsFrame(
         auto frame = std::make_shared<std::vector<uint8_t>>(nPixels * kChannelsPerPixelS);
         for (size_t i = 0; i < nPixels; ++i) {
             uint8_t *d = frame->data() + i * kChannelsPerPixelS;
-            d[0] = cmyk[i * 4];
-            d[1] = cmyk[i * 4 + 1];
-            d[2] = cmyk[i * 4 + 2];
-            d[3] = cmyk[i * 4 + 3];
-            d[4] = (bands == 4) ? px[i * bands + 3] : 255; // alpha 直拷 / 无 alpha
+            d[0]       = cmyk[i * 4];
+            d[1]       = cmyk[i * 4 + 1];
+            d[2]       = cmyk[i * 4 + 2];
+            d[3]       = cmyk[i * 4 + 3];
+            d[4]       = (bands == 4) ? px[i * bands + 3] : 255; // alpha 直拷 / 无 alpha
         }
         g_free(raw);
         return frame;
@@ -378,7 +378,7 @@ std::shared_ptr<std::vector<uint8_t>> decodeVipsFrame(
     // 其余解释（LAB/XYZ/scRGB…）或异常 band 数 → 解码失败（对齐
     // ImageRenderer：非 sRGB/RGB 解释拒绝，不降级）
     EELog::warn("Unsupported source colourspace ({}) for texture: {}", static_cast<int>(interp),
-        path);
+                path);
     g_object_unref(img);
     return nullptr;
 }
@@ -389,8 +389,11 @@ std::shared_ptr<std::vector<uint8_t>> decodeVipsFrame(
 //  TextureSource
 // ═══════════════════════════════════════════════════════════════════════
 
-TextureSource::TextureSource(const std::string &filePath, const Dpi &canvasDpi, IColorConverter *cv,
-    int overrideW, int overrideH)
+TextureSource::TextureSource(const std::string &filePath,
+                             const Dpi         &canvasDpi,
+                             IColorConverter   *cv,
+                             int                overrideW,
+                             int                overrideH)
     : m_path(filePath)
     , m_canvasDpi(canvasDpi)
     , m_cv(cv)
@@ -417,9 +420,9 @@ bool TextureSource::open()
 {
     // ── 1. 元数据读取 ────────────────────────────────────────────────
     if (isTiffPath(m_path)) {
-        auto prevErr = TIFFSetErrorHandler(nullptr);
-        auto prevWarn = TIFFSetWarningHandler(nullptr);
-        TIFF *tif = TiffHelper::openTiff(m_path, "r");
+        auto  prevErr  = TIFFSetErrorHandler(nullptr);
+        auto  prevWarn = TIFFSetWarningHandler(nullptr);
+        TIFF *tif      = FileUtil::openTiff(m_path, "r");
         TIFFSetErrorHandler(prevErr);
         TIFFSetWarningHandler(prevWarn);
         if (!tif) {
@@ -431,7 +434,7 @@ bool TextureSource::open()
         uint32_t w = 0, h = 0;
         TIFFGetField(tif, TIFFTAG_IMAGEWIDTH, &w);
         TIFFGetField(tif, TIFFTAG_IMAGELENGTH, &h);
-        float xres = 72.0f, yres = 72.0f;
+        float    xres = 72.0f, yres = 72.0f;
         uint16_t resUnit = RESUNIT_INCH;
         TIFFGetFieldDefaulted(tif, TIFFTAG_XRESOLUTION, &xres);
         TIFFGetFieldDefaulted(tif, TIFFTAG_YRESOLUTION, &yres);
@@ -449,8 +452,8 @@ bool TextureSource::open()
         }
         m_imgDpiX = (static_cast<double>(xres) >= 1.0) ? static_cast<double>(xres) : 72.0;
         m_imgDpiY = (static_cast<double>(yres) >= 1.0) ? static_cast<double>(yres) : 72.0;
-        m_srcW = static_cast<int>(w);
-        m_srcH = static_cast<int>(h);
+        m_srcW    = static_cast<int>(w);
+        m_srcH    = static_cast<int>(h);
     } else {
         suppressVipsWarnings();
         VipsImage *img =
@@ -462,8 +465,8 @@ bool TextureSource::open()
             s_badFiles.insert(m_path);
             return false;
         }
-        int w = vips_image_get_width(img);
-        int h = vips_image_get_height(img);
+        int w             = vips_image_get_width(img);
+        int h             = vips_image_get_height(img);
         auto [dpiX, dpiY] = extractVipsImageDpi(img);
         g_object_unref(img);
         if (w <= 0 || h <= 0) {
@@ -475,8 +478,8 @@ bool TextureSource::open()
         }
         m_imgDpiX = dpiX;
         m_imgDpiY = dpiY;
-        m_srcW = w;
-        m_srcH = h;
+        m_srcW    = w;
+        m_srcH    = h;
     }
 
     // ── 2. tile 尺寸（逐维独立：override > 0 用 override，否则该维回退
@@ -491,7 +494,7 @@ bool TextureSource::open()
     // ── 3. 缓存命中（帧 + 其源尺寸）/ 已知坏文件 ────────────────────
     {
         std::lock_guard<std::mutex> lock(s_mtx);
-        auto it = s_cache.find(m_path); // 缓存键 = filePath（仅路径）
+        auto                        it = s_cache.find(m_path); // 缓存键 = filePath（仅路径）
         if (it != s_cache.end() && it->second.srcW == m_srcW && it->second.srcH == m_srcH) {
             m_frame = it->second.frame;
             return true;
@@ -513,11 +516,11 @@ bool TextureSource::open()
     // ── 4. 解码 ──────────────────────────────────────────────────────
     std::shared_ptr<std::vector<uint8_t>> frame;
     if (isTiffPath(m_path))
-        frame = decodeTiffFrame(
-            m_path, m_cv, static_cast<uint32_t>(m_srcW), static_cast<uint32_t>(m_srcH));
+        frame = decodeTiffFrame(m_path, m_cv, static_cast<uint32_t>(m_srcW),
+                                static_cast<uint32_t>(m_srcH));
     else
-        frame = decodeVipsFrame(
-            m_path, m_cv, static_cast<uint32_t>(m_srcW), static_cast<uint32_t>(m_srcH));
+        frame = decodeVipsFrame(m_path, m_cv, static_cast<uint32_t>(m_srcW),
+                                static_cast<uint32_t>(m_srcH));
     if (!frame) {
         warnOnce(m_path, "Decode failed for texture: " + m_path);
         std::lock_guard<std::mutex> lock(s_mtx);
@@ -563,16 +566,19 @@ bool TextureSource::sample(
 
     // 直拷 5 通道（C、M、Y、K、A）
     const uint8_t *p = m_frame->data() + (static_cast<size_t>(i) * m_srcW + j) * kChannelsPerPixelS;
-    c1 = p[0];
-    c2 = p[1];
-    c3 = p[2];
-    c4 = p[3];
-    a = p[4];
+    c1               = p[0];
+    c2               = p[1];
+    c3               = p[2];
+    c4               = p[3];
+    a                = p[4];
     return true;
 }
 
-void TextureSource::preDecode(const std::string &filePath, const Dpi &canvasDpi, IColorConverter *cv,
-    int overrideW, int overrideH)
+void TextureSource::preDecode(const std::string &filePath,
+                              const Dpi         &canvasDpi,
+                              IColorConverter   *cv,
+                              int                overrideW,
+                              int                overrideH)
 {
     // 构造即触发解码 + 发布缓存；失败已在内部标记 s_badFiles，
     // render 期构造同一 key 的实例会立刻 ok()==false。

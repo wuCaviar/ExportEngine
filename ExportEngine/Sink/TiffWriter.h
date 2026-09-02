@@ -145,9 +145,14 @@ public:
     //  once per successful beginStripWrite.
     //
     //  iccBytes: ICC profile bytes to embed (empty for naive/no-ICC mode).
-    [[nodiscard]] bool beginStripWrite(const std::string &filePath, int width, int height, Dpi dpi,
-        int rowsPerStrip, const std::vector<uint8_t> &iccBytes, int samplesPerPixel = 4,
-        const std::vector<uint16_t> &sampleInfo = {});
+    [[nodiscard]] bool beginStripWrite(const std::string           &filePath,
+                                       int                          width,
+                                       int                          height,
+                                       Dpi                          dpi,
+                                       int                          rowsPerStrip,
+                                       const std::vector<uint8_t>  &iccBytes,
+                                       int                          samplesPerPixel = 4,
+                                       const std::vector<uint16_t> &sampleInfo      = {});
     [[nodiscard]] bool writeStrip(int startRow, int rows, std::vector<uint8_t> cmykBuf);
     [[nodiscard]] bool endStripWrite();
 
@@ -171,8 +176,8 @@ private:
     // ------------------------------------------------------------------
     struct WriteTask
     {
-        uint32_t index = 0; // tile or strip index
-        std::vector<uint8_t> buffer; // padded pixel data
+        uint32_t             index = 0; // tile or strip index
+        std::vector<uint8_t> buffer;    // padded pixel data
     };
 
     // ------------------------------------------------------------------
@@ -191,12 +196,12 @@ private:
         bool pop(WriteTask &out);
         void close();
 
-        const size_t capacity;
-        std::queue<WriteTask> q;
-        std::mutex mtx;
+        const size_t            capacity;
+        std::queue<WriteTask>   q;
+        std::mutex              mtx;
         std::condition_variable cvNotEmpty;
         std::condition_variable cvNotFull;
-        bool closed = false;
+        bool                    closed = false;
     };
 
     // Session mode — distinguishes an active session from none.
@@ -211,8 +216,12 @@ private:
     // ------------------------------------------------------------------
 
     // Set tags common to the TIFF write path
-    static void setupTiffCommon(TIFF *tif, int width, int height, Dpi dpi, int samplesPerPixel,
-        const std::vector<uint16_t> &sampleInfo);
+    static void setupTiffCommon(TIFF                        *tif,
+                                int                          width,
+                                int                          height,
+                                Dpi                          dpi,
+                                int                          samplesPerPixel,
+                                const std::vector<uint16_t> &sampleInfo);
 
     // Background I/O worker for the strip streaming path.
     // Single-threaded consumer of m_queue; calls TIFFWriteEncodedStrip().
@@ -230,20 +239,20 @@ private:
     mutable std::mutex m_errorMutex;
 
     // === Streaming state (strip mode) ===
-    TIFF *m_tif = nullptr;
-    int m_width = 0;
-    int m_height = 0;
-    int m_rowsPerStrip = 0;
-    int m_samplesPerPixel = 4; // output spp (4=std CMYK, >4=multi-channel)
-    std::vector<uint16_t> m_sampleInfo; // TIFFTAG_EXTRASAMPLES data
-    SessionMode m_mode = SessionMode::None;
+    TIFF                 *m_tif             = nullptr;
+    int                   m_width           = 0;
+    int                   m_height          = 0;
+    int                   m_rowsPerStrip    = 0;
+    int                   m_samplesPerPixel = 4; // output spp (4=std CMYK, >4=multi-channel)
+    std::vector<uint16_t> m_sampleInfo;          // TIFFTAG_EXTRASAMPLES data
+    SessionMode           m_mode = SessionMode::None;
 
     // Bounded producer-consumer queue. Capacity caps peak in-flight memory:
     //   Strip peak ≈ kQueueCapacity × rowsPerStrip × width × 4 bytes
-    static constexpr size_t kQueueCapacity = 4;
+    static constexpr size_t       kQueueCapacity = 4;
     std::unique_ptr<BoundedQueue> m_queue;
-    std::thread m_ioThread;
-    std::atomic<bool> m_ioError{ false };
+    std::thread                   m_ioThread;
+    std::atomic<bool>             m_ioError{ false };
 };
 
 } // namespace ATHC::EE

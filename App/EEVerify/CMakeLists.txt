@@ -52,7 +52,6 @@ target_include_directories(test_errors
         ${CMAKE_SOURCE_DIR}/ExportEngine
         ${CMAKE_SOURCE_DIR}/ExportEngine/Core   # TiffWriter.h, ...
         ${CMAKE_SOURCE_DIR}/ExportEngine/Color  # ColorConverter.h
-        ${CMAKE_SOURCE_DIR}/ExportEngine/Font    # FontEngine.h
         ${CMAKE_SOURCE_DIR}/ExportEngine/Render  # TextureSource.h
         ${CMAKE_SOURCE_DIR}/ExportEngine/Sink    # MemorySink.h
         ${VCPKG_DIR}/include          # spdlog

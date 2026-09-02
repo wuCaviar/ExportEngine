@@ -13,7 +13,7 @@ if(MSVC)
 endif()
 
 # ── Output directories ──────────────────────────────────────────────
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/$<CONFIG>)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY  ${CMAKE_SOURCE_DIR}/bin/$<CONFIG>)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY  ${CMAKE_SOURCE_DIR}/bin/$<CONFIG>)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY  ${CMAKE_SOURCE_DIR}/bin/$<CONFIG>)
 
@@ -74,6 +74,26 @@ if(APPLE)
     set_target_properties(cairo PROPERTIES
         IMPORTED_LOCATION "${CAIRO_LIBRARY}"
         INTERFACE_INCLUDE_DIRECTORIES "${CAIRO_INCLUDE_DIR};${BREW_PREFIX}/include"
+    )
+
+    # Pango — text layout engine (multi-line, shaping, font fallback)
+    find_library(PANGO_LIBRARY pango-1.0 PATHS "${BREW_PREFIX}/lib" REQUIRED)
+    find_library(PANGOCAIRO_LIBRARY pangocairo-1.0 PATHS "${BREW_PREFIX}/lib" REQUIRED)
+    add_library(pango SHARED IMPORTED)
+    set_target_properties(pango PROPERTIES
+        IMPORTED_LOCATION "${PANGO_LIBRARY}"
+        INTERFACE_INCLUDE_DIRECTORIES "${BREW_PREFIX}/include/pango-1.0"
+    )
+    add_library(pangocairo SHARED IMPORTED)
+    set_target_properties(pangocairo PROPERTIES
+        IMPORTED_LOCATION "${PANGOCAIRO_LIBRARY}"
+        INTERFACE_LINK_LIBRARIES pango
+    )
+    find_library(PANGOFT2_LIBRARY pangoft2-1.0 PATHS "${BREW_PREFIX}/lib" REQUIRED)
+    add_library(pangoft2 SHARED IMPORTED)
+    set_target_properties(pangoft2 PROPERTIES
+        IMPORTED_LOCATION "${PANGOFT2_LIBRARY}"
+        INTERFACE_LINK_LIBRARIES pango
     )
 
 elseif(WIN32)
@@ -150,6 +170,38 @@ elseif(WIN32)
         "${VCPKG_DIR}/lib/glib-2.0/include"
     )
     target_link_libraries(vips INTERFACE ${GLIB2_LIB} ${GOBJECT2_LIB})
+
+    # Pango — text layout engine (multi-line, shaping, font fallback)
+    add_library(pango SHARED IMPORTED)
+    set_target_properties(pango PROPERTIES
+        IMPORTED_LOCATION_DEBUG   "${VCPKG_DIR}/debug/bin/pango-1.0-0.dll"
+        IMPORTED_IMPLIB_DEBUG     "${VCPKG_DIR}/debug/lib/pango-1.0.lib"
+        IMPORTED_LOCATION_RELEASE "${VCPKG_DIR}/bin/pango-1.0-0.dll"
+        IMPORTED_IMPLIB_RELEASE   "${VCPKG_DIR}/lib/pango-1.0.lib"
+    )
+    target_include_directories(pango INTERFACE
+        "${VCPKG_DIR}/include/pango-1.0"
+        "${VCPKG_DIR}/include/harfbuzz")
+
+    add_library(pangocairo SHARED IMPORTED)
+    set_target_properties(pangocairo PROPERTIES
+        IMPORTED_LOCATION_DEBUG   "${VCPKG_DIR}/debug/bin/pangocairo-1.0-0.dll"
+        IMPORTED_IMPLIB_DEBUG     "${VCPKG_DIR}/debug/lib/pangocairo-1.0.lib"
+        IMPORTED_LOCATION_RELEASE "${VCPKG_DIR}/bin/pangocairo-1.0-0.dll"
+        IMPORTED_IMPLIB_RELEASE   "${VCPKG_DIR}/lib/pangocairo-1.0.lib"
+    )
+    target_link_libraries(pangocairo INTERFACE pango)
+
+    # pangoft2 — FT2/fontconfig font map (resolves localized family names
+    # like 宋体 that the win32/GDI backend cannot)
+    add_library(pangoft2 SHARED IMPORTED)
+    set_target_properties(pangoft2 PROPERTIES
+        IMPORTED_LOCATION_DEBUG   "${VCPKG_DIR}/debug/bin/pangoft2-1.0-0.dll"
+        IMPORTED_IMPLIB_DEBUG     "${VCPKG_DIR}/debug/lib/pangoft2-1.0.lib"
+        IMPORTED_LOCATION_RELEASE "${VCPKG_DIR}/bin/pangoft2-1.0-0.dll"
+        IMPORTED_IMPLIB_RELEASE   "${VCPKG_DIR}/lib/pangoft2-1.0.lib"
+    )
+    target_link_libraries(pangoft2 INTERFACE pango)
 
     # Cairo — vector graphics rendering (replaces AGG)
     find_path(CAIRO_INCLUDE_DIR cairo.h

@@ -23,11 +23,11 @@ namespace ATHC::EE {
 // 源像素颜色空间（EE 探测得到，只做「描述」，不参与转换）。
 enum class PixelColorSpace : uint8_t
 {
-    Rgb, // 3 字节/像素（RGB_8）
-    Rgba, // 4 字节/像素（RGBA_8，alpha 不参与转换）
-    Gray, // 1 字节/像素（GRAY_8）
+    Rgb,   // 3 字节/像素（RGB_8）
+    Rgba,  // 4 字节/像素（RGBA_8，alpha 不参与转换）
+    Gray,  // 1 字节/像素（GRAY_8）
     GrayA, // 2 字节/像素（GRAYA_8，alpha 不参与转换）
-    Cmyk, // 直通（调用方原样拷贝 4 字节，含专色通道按需保留）
+    Cmyk,  // 直通（调用方原样拷贝 4 字节，含专色通道按需保留）
 };
 
 // 不透明转换句柄：源 → CMYK_8（4 字节/像素）。每线程独立、非线程安全。
@@ -49,8 +49,8 @@ public:
     // embeddedIcc = 源像素内嵌的 ICC 字节（可为空 = 无内嵌，引擎用自身回退 profile）。
     // Cmyk 空间返回 nullptr = 直通（调用方原样拷贝，不转换）。
     // 引擎未就绪/源空间不支持时返回 nullptr（源图跳过）。
-    virtual std::unique_ptr<IColorTransform> makeToCmyk(
-        PixelColorSpace src, const std::vector<uint8_t> &embeddedIcc) = 0;
+    virtual std::unique_ptr<IColorTransform>
+    makeToCmyk(PixelColorSpace src, const std::vector<uint8_t> &embeddedIcc) = 0;
 
     // 每线程独立克隆（transform 句柄非线程安全）。
     virtual std::unique_ptr<IColorConverter> cloneForThread() const = 0;

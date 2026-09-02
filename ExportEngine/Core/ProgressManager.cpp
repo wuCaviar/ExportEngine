@@ -8,28 +8,29 @@ ProgressManager &ProgressManager::instance()
     return mgr;
 }
 
-void ProgressManager::startTask(
-    const std::string &taskId, int totalSteps, const std::string &message)
+void ProgressManager::startTask(const std::string &taskId,
+                                int                totalSteps,
+                                const std::string &message)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-    TaskProgress &t = m_tasks[taskId];
-    t.taskId = taskId;
-    t.status = "running";
-    t.current = 0;
-    t.total = totalSteps;
-    t.percent = 0.0;
-    t.message = message;
+    TaskProgress               &t = m_tasks[taskId];
+    t.taskId                      = taskId;
+    t.status                      = "running";
+    t.current                     = 0;
+    t.total                       = totalSteps;
+    t.percent                     = 0.0;
+    t.message                     = message;
 }
 
 void ProgressManager::updateTask(const std::string &taskId, int current, const std::string &message)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-    auto it = m_tasks.find(taskId);
+    auto                        it = m_tasks.find(taskId);
     if (it == m_tasks.end())
         return;
     TaskProgress &t = it->second;
-    t.current = current;
-    t.percent = t.total > 0 ? (current * 100.0 / t.total) : 0.0;
+    t.current       = current;
+    t.percent       = t.total > 0 ? (current * 100.0 / t.total) : 0.0;
     if (!message.empty())
         t.message = message;
 }
@@ -37,13 +38,13 @@ void ProgressManager::updateTask(const std::string &taskId, int current, const s
 void ProgressManager::finishTask(const std::string &taskId, const std::string &message)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-    auto it = m_tasks.find(taskId);
+    auto                        it = m_tasks.find(taskId);
     if (it == m_tasks.end())
         return;
     TaskProgress &t = it->second;
-    t.status = "done";
-    t.current = t.total;
-    t.percent = 100.0;
+    t.status        = "done";
+    t.current       = t.total;
+    t.percent       = 100.0;
     if (!message.empty())
         t.message = message;
 }
@@ -51,11 +52,11 @@ void ProgressManager::finishTask(const std::string &taskId, const std::string &m
 void ProgressManager::failTask(const std::string &taskId, const std::string &message)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-    auto it = m_tasks.find(taskId);
+    auto                        it = m_tasks.find(taskId);
     if (it == m_tasks.end())
         return;
     TaskProgress &t = it->second;
-    t.status = "error";
+    t.status        = "error";
     if (!message.empty())
         t.message = message;
 }
@@ -63,7 +64,7 @@ void ProgressManager::failTask(const std::string &taskId, const std::string &mes
 TaskProgress ProgressManager::getTask(const std::string &taskId) const
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-    auto it = m_tasks.find(taskId);
+    auto                        it = m_tasks.find(taskId);
     if (it != m_tasks.end())
         return it->second;
     return TaskProgress{ taskId, "idle", 0, 0, 0.0, "task not found" };

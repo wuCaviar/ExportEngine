@@ -85,7 +85,7 @@ std::error_code JsonSceneParser::parseFromJson(const std::string &jsonStr, Canva
             return EEError::parse_invalid_canvas_unit;
 
         // -- canvas dimensions (convert to pixels before storing) --
-        int rawWidth = canvasObj.value("width", 800);
+        int rawWidth  = canvasObj.value("width", 800);
         int rawHeight = canvasObj.value("height", 600);
         // -- dpi（X/Y 独立，缺省 300）--
         // 旧字段 dpi 已废弃：存在且新字段均缺失时报错，防止迁移时静默回退 300
@@ -171,9 +171,9 @@ Color JsonSceneParser::parseColor(const void *obj)
     if (j.contains("r") || j.contains("g") || j.contains("b"))
         throw ColorParseError{ EEError::parse_rgba_color_removed };
 
-    Color color = Color::fromCMYK(j.value("c", 0.0) * 255.0 / 100.0,
-        j.value("m", 0.0) * 255.0 / 100.0, j.value("y", 0.0) * 255.0 / 100.0,
-        j.value("k", 0.0) * 255.0 / 100.0, j.value("a", 1.0));
+    Color color = Color::fromCMYK(
+        j.value("c", 0.0) * 255.0 / 100.0, j.value("m", 0.0) * 255.0 / 100.0,
+        j.value("y", 0.0) * 255.0 / 100.0, j.value("k", 0.0) * 255.0 / 100.0, j.value("a", 1.0));
 
     // Gradient must not be nested inside a color object — it is a peer key.
     if (j.contains("gradient")) {
@@ -188,7 +188,7 @@ Color JsonSceneParser::parseColor(const void *obj)
 Gradient JsonSceneParser::parseGradient(const void *obj)
 {
     const auto &g = *static_cast<const json *>(obj);
-    Gradient grad;
+    Gradient    grad;
 
     std::string type = g.value("type", "");
     if (type == "linear")
@@ -209,19 +209,19 @@ Gradient JsonSceneParser::parseGradient(const void *obj)
         // for correct segment lookup via linear scan.
         if (grad.stops.size() > 1) {
             std::sort(grad.stops.begin(), grad.stops.end(),
-                [](const Gradient::Stop &a, const Gradient::Stop &b) {
-                    return a.offset < b.offset;
-                });
+                      [](const Gradient::Stop &a, const Gradient::Stop &b) {
+                          return a.offset < b.offset;
+                      });
         }
     }
 
-    grad.x1 = g.value("x1", 0.0);
-    grad.y1 = g.value("y1", 0.0);
-    grad.x2 = g.value("x2", 1.0);
-    grad.y2 = g.value("y2", 0.0);
-    grad.cx = g.value("cx", 0.5);
-    grad.cy = g.value("cy", 0.5);
-    grad.r = g.value("r", 0.5);
+    grad.x1         = g.value("x1", 0.0);
+    grad.y1         = g.value("y1", 0.0);
+    grad.x2         = g.value("x2", 1.0);
+    grad.y2         = g.value("y2", 0.0);
+    grad.cx         = g.value("cx", 0.5);
+    grad.cy         = g.value("cy", 0.5);
+    grad.r          = g.value("r", 0.5);
     grad.startAngle = g.value("startAngle", 0.0);
 
     return grad;
@@ -230,7 +230,7 @@ Gradient JsonSceneParser::parseGradient(const void *obj)
 GridFill JsonSceneParser::parseGridFill(const void *obj, const Dpi &dpi)
 {
     const auto &j = *static_cast<const json *>(obj);
-    GridFill g;
+    GridFill    g;
     if (j.contains("gridColor"))
         g.gridColor = parseColor(&j["gridColor"]);
     if (j.contains("backgroundColor"))
@@ -238,29 +238,29 @@ GridFill JsonSceneParser::parseGridFill(const void *obj, const Dpi &dpi)
     g.transparentBackground = j.value("transparentBackground", false);
 
     // 网格尺寸固定：格子 = 1mm（X 用 dpiX、Y 用 dpiY 换算为像素），线宽 = 1px
-    g.cellWidth = static_cast<double>(dpi.x) / 25.4;
+    g.cellWidth  = static_cast<double>(dpi.x) / 25.4;
     g.cellHeight = static_cast<double>(dpi.y) / 25.4;
-    g.lineWidth = 1.0;
+    g.lineWidth  = 1.0;
     for (const char *k : { "cellWidth", "cellHeight", "lineWidth" })
         if (j.contains(k))
             EELog::warn("GridFill field '{}' is deprecated and ignored — grid cell "
                         "is fixed at 1mm and line width at 1px, computed from the "
                         "canvas dpi.",
-                k);
+                        k);
     return g;
 }
 
-TextureFill JsonSceneParser::parseTextureFill(
-    const void *obj, const std::string &unit, const Dpi &dpi)
+TextureFill
+JsonSceneParser::parseTextureFill(const void *obj, const std::string &unit, const Dpi &dpi)
 {
     const auto &j = *static_cast<const json *>(obj);
     TextureFill t;
-    t.filePath = j.value("filePath", "");
-    t.offsetX = toPixelsX(j.value("offsetX", 0.0), unit, dpi);
-    t.offsetY = toPixelsY(j.value("offsetY", 0.0), unit, dpi);
+    t.filePath        = j.value("filePath", "");
+    t.offsetX         = toPixelsX(j.value("offsetX", 0.0), unit, dpi);
+    t.offsetY         = toPixelsY(j.value("offsetY", 0.0), unit, dpi);
     t.useOriginalSize = j.value("useOriginalSize", false);
-    t.customWidth = toPixelsX(j.value("customWidth", 0.0), unit, dpi);
-    t.customHeight = toPixelsY(j.value("customHeight", 0.0), unit, dpi);
+    t.customWidth     = toPixelsX(j.value("customWidth", 0.0), unit, dpi);
+    t.customHeight    = toPixelsY(j.value("customHeight", 0.0), unit, dpi);
     if (t.filePath.empty())
         EELog::warn("TextureFill has empty filePath — fill skipped.");
     else if (!t.useOriginalSize && (t.customWidth <= 0 || t.customHeight <= 0))
@@ -269,8 +269,8 @@ TextureFill JsonSceneParser::parseTextureFill(
     return t;
 }
 
-LineStyle JsonSceneParser::parseLineStyle(
-    const void *obj, const std::string &key, LineStyle defaultVal)
+LineStyle
+JsonSceneParser::parseLineStyle(const void *obj, const std::string &key, LineStyle defaultVal)
 {
     const auto &j = *static_cast<const json *>(obj);
     if (!j.contains(key))
@@ -293,31 +293,31 @@ LineStyle JsonSceneParser::parseLineStyle(
 
 Rect JsonSceneParser::parseRect(const void *obj, const std::string &canvasUnit, const Dpi &dpi)
 {
-    const auto &j = *static_cast<const json *>(obj);
-    auto unit = resolveUnit(j, canvasUnit);
+    const auto &j    = *static_cast<const json *>(obj);
+    auto        unit = resolveUnit(j, canvasUnit);
 
     Rect r;
-    r.x = toPixelsX(j.value("x", 0.0), unit, dpi);
-    r.y = toPixelsY(j.value("y", 0.0), unit, dpi);
-    r.width = toPixelsX(j.value("width", 0.0), unit, dpi);
-    r.height = toPixelsY(j.value("height", 0.0), unit, dpi);
-    r.strokeWidth = toPixelsX(j.value("strokeWidth", 0.0), unit, dpi);
-    r.z = j.value("z", 0.0);
+    r.x            = toPixelsX(j.value("x", 0.0), unit, dpi);
+    r.y            = toPixelsY(j.value("y", 0.0), unit, dpi);
+    r.width        = toPixelsX(j.value("width", 0.0), unit, dpi);
+    r.height       = toPixelsY(j.value("height", 0.0), unit, dpi);
+    r.strokeWidth  = toPixelsX(j.value("strokeWidth", 0.0), unit, dpi);
+    r.z            = j.value("z", 0.0);
     r.cornerRadius = toPixelsX(j.value("cornerRadius", 0.0), unit, dpi);
-    r.lineStyle = parseLineStyle(&j, "lineStyle", LineStyle::Solid);
+    r.lineStyle    = parseLineStyle(&j, "lineStyle", LineStyle::Solid);
 
     // Fill modes are mutually exclusive — prefer in order:
     // textureFill > gridFill > gradient > fillColor
-    bool hasFill = j.contains("fillColor");
-    bool hasGrad = j.contains("gradient");
-    bool hasGrid = j.contains("gridFill");
+    bool hasFill    = j.contains("fillColor");
+    bool hasGrad    = j.contains("gradient");
+    bool hasGrid    = j.contains("gridFill");
     bool hasTexture = j.contains("textureFill");
-    int fillCount =
+    int  fillCount =
         (hasFill ? 1 : 0) + (hasGrad ? 1 : 0) + (hasGrid ? 1 : 0) + (hasTexture ? 1 : 0);
     if (fillCount > 1) {
         EELog::warn("Rect has {} fill keys (fillColor/gradient/gridFill/textureFill) — "
                     "only one is used; priority: textureFill > gridFill > gradient > fillColor.",
-            fillCount);
+                    fillCount);
     }
     if (hasFill && !hasGrad && !hasGrid && !hasTexture)
         r.fillColor = parseColor(&j["fillColor"]);
@@ -335,12 +335,12 @@ Rect JsonSceneParser::parseRect(const void *obj, const std::string &canvasUnit, 
 
 Circle JsonSceneParser::parseCircle(const void *obj, const std::string &canvasUnit, const Dpi &dpi)
 {
-    const auto &j = *static_cast<const json *>(obj);
-    auto unit = resolveUnit(j, canvasUnit);
+    const auto &j    = *static_cast<const json *>(obj);
+    auto        unit = resolveUnit(j, canvasUnit);
 
     Circle c;
-    c.cx = toPixelsX(j.value("cx", 0.0), unit, dpi);
-    c.cy = toPixelsY(j.value("cy", 0.0), unit, dpi);
+    c.cx      = toPixelsX(j.value("cx", 0.0), unit, dpi);
+    c.cy      = toPixelsY(j.value("cy", 0.0), unit, dpi);
     c.radiusX = toPixelsX(j.value("radiusX", 0.0), unit, dpi);
     // radiusY 缺省时用 Y 轴换算同一 radiusX 的 JSON 原始值——各向异性下
     // 物理尺寸保持正圆（各向同性输入与旧的 c.radiusY = c.radiusX 等价）
@@ -349,8 +349,8 @@ Circle JsonSceneParser::parseCircle(const void *obj, const std::string &canvasUn
     else
         c.radiusY = toPixelsY(j.value("radiusX", 0.0), unit, dpi);
     c.strokeWidth = toPixelsX(j.value("strokeWidth", 0.0), unit, dpi);
-    c.z = j.value("z", 0.0);
-    c.lineStyle = parseLineStyle(&j, "lineStyle", LineStyle::Solid);
+    c.z           = j.value("z", 0.0);
+    c.lineStyle   = parseLineStyle(&j, "lineStyle", LineStyle::Solid);
 
     // fillColor and gradient are mutually exclusive — prefer gradient, warn
     bool hasFill = j.contains("fillColor");
@@ -370,48 +370,48 @@ Circle JsonSceneParser::parseCircle(const void *obj, const std::string &canvasUn
     return c;
 }
 
-FreeLine JsonSceneParser::parseFreeLine(
-    const void *obj, const std::string &canvasUnit, const Dpi &dpi)
+FreeLine
+JsonSceneParser::parseFreeLine(const void *obj, const std::string &canvasUnit, const Dpi &dpi)
 {
-    const auto &j = *static_cast<const json *>(obj);
-    auto unit = resolveUnit(j, canvasUnit);
+    const auto &j    = *static_cast<const json *>(obj);
+    auto        unit = resolveUnit(j, canvasUnit);
 
     FreeLine fl;
     fl.strokeWidth = toPixelsX(j.value("strokeWidth", 1.0), unit, dpi);
-    fl.z = j.value("z", 0.0);
-    fl.lineStyle = parseLineStyle(&j, "lineStyle", LineStyle::Solid);
+    fl.z           = j.value("z", 0.0);
+    fl.lineStyle   = parseLineStyle(&j, "lineStyle", LineStyle::Solid);
 
     if (j.contains("strokeColor"))
         fl.strokeColor = parseColor(&j["strokeColor"]);
 
     if (j.contains("points"))
         for (auto &pt : j["points"]) {
-            auto p = std::make_pair(
-                toPixelsX(pt.value("x", 0.0), unit, dpi), toPixelsY(pt.value("y", 0.0), unit, dpi));
+            auto p = std::make_pair(toPixelsX(pt.value("x", 0.0), unit, dpi),
+                                    toPixelsY(pt.value("y", 0.0), unit, dpi));
             fl.points.push_back(p);
         }
 
     return fl;
 }
 
-BezierCurve JsonSceneParser::parseBezierCurve(
-    const void *obj, const std::string &canvasUnit, const Dpi &dpi)
+BezierCurve
+JsonSceneParser::parseBezierCurve(const void *obj, const std::string &canvasUnit, const Dpi &dpi)
 {
-    const auto &j = *static_cast<const json *>(obj);
-    auto unit = resolveUnit(j, canvasUnit);
+    const auto &j    = *static_cast<const json *>(obj);
+    auto        unit = resolveUnit(j, canvasUnit);
 
     BezierCurve bc;
     bc.strokeWidth = toPixelsX(j.value("strokeWidth", 1.0), unit, dpi);
-    bc.z = j.value("z", 0.0);
-    bc.lineStyle = parseLineStyle(&j, "lineStyle", LineStyle::Solid);
+    bc.z           = j.value("z", 0.0);
+    bc.lineStyle   = parseLineStyle(&j, "lineStyle", LineStyle::Solid);
 
     if (j.contains("strokeColor"))
         bc.strokeColor = parseColor(&j["strokeColor"]);
 
     if (j.contains("controlPoints"))
         for (auto &pt : j["controlPoints"]) {
-            auto p = std::make_pair(
-                toPixelsX(pt.value("x", 0.0), unit, dpi), toPixelsY(pt.value("y", 0.0), unit, dpi));
+            auto p = std::make_pair(toPixelsX(pt.value("x", 0.0), unit, dpi),
+                                    toPixelsY(pt.value("y", 0.0), unit, dpi));
             bc.controlPoints.push_back(p);
         }
 
@@ -420,17 +420,17 @@ BezierCurve JsonSceneParser::parseBezierCurve(
 
 Line JsonSceneParser::parseLine(const void *obj, const std::string &canvasUnit, const Dpi &dpi)
 {
-    const auto &j = *static_cast<const json *>(obj);
-    auto unit = resolveUnit(j, canvasUnit);
+    const auto &j    = *static_cast<const json *>(obj);
+    auto        unit = resolveUnit(j, canvasUnit);
 
     Line l;
-    l.x1 = toPixelsX(j.value("x1", 0.0), unit, dpi);
-    l.y1 = toPixelsY(j.value("y1", 0.0), unit, dpi);
-    l.x2 = toPixelsX(j.value("x2", 0.0), unit, dpi);
-    l.y2 = toPixelsY(j.value("y2", 0.0), unit, dpi);
+    l.x1          = toPixelsX(j.value("x1", 0.0), unit, dpi);
+    l.y1          = toPixelsY(j.value("y1", 0.0), unit, dpi);
+    l.x2          = toPixelsX(j.value("x2", 0.0), unit, dpi);
+    l.y2          = toPixelsY(j.value("y2", 0.0), unit, dpi);
     l.strokeWidth = toPixelsX(j.value("strokeWidth", 1.0), unit, dpi);
-    l.z = j.value("z", 0.0);
-    l.lineStyle = parseLineStyle(&j, "lineStyle", LineStyle::Solid);
+    l.z           = j.value("z", 0.0);
+    l.lineStyle   = parseLineStyle(&j, "lineStyle", LineStyle::Solid);
 
     if (j.contains("strokeColor"))
         l.strokeColor = parseColor(&j["strokeColor"]);
@@ -440,8 +440,8 @@ Line JsonSceneParser::parseLine(const void *obj, const std::string &canvasUnit, 
 
 Text JsonSceneParser::parseText(const void *obj, const std::string &canvasUnit, const Dpi &dpi)
 {
-    const auto &j = *static_cast<const json *>(obj);
-    auto unit = resolveUnit(j, canvasUnit);
+    const auto &j    = *static_cast<const json *>(obj);
+    auto        unit = resolveUnit(j, canvasUnit);
 
     Text t;
 
@@ -451,35 +451,42 @@ Text JsonSceneParser::parseText(const void *obj, const std::string &canvasUnit, 
     t.z = j.value("z", 0.0);
 
     // 文字属性 (fontSize is pt, not affected by unit)
-    t.content = j.value("content", "");
+    t.content    = j.value("content", "");
     t.fontFamily = j.value("fontFamily", "Arial");
-    t.fontSize = j.value("fontSize", 16.0);
-    t.bold = j.value("bold", false);
-    t.italic = j.value("italic", false);
+    t.fontSize   = j.value("fontSize", 16.0);
+    t.bold       = j.value("bold", false);
+    t.italic     = j.value("italic", false);
+    t.underline  = j.value("underline", false);
 
     if (j.contains("textColor"))
         t.textColor = parseColor(&j["textColor"]);
     else
         t.textColor = Color{}; // 默认黑（CMYK 0,0,0,100%）
 
+    // 目标尺寸（0 = 自然尺寸，不缩放）与下划线
+    double w = j.value("width", 0.0);
+    double h = j.value("height", 0.0);
+    t.width  = (w > 0.0) ? toPixelsX(w, unit, dpi) : 0.0;
+    t.height = (h > 0.0) ? toPixelsY(h, unit, dpi) : 0.0;
+
     return t;
 }
 
-ImageItem JsonSceneParser::parseImage(
-    const void *obj, const std::string &canvasUnit, const Dpi &dpi)
+ImageItem
+JsonSceneParser::parseImage(const void *obj, const std::string &canvasUnit, const Dpi &dpi)
 {
-    const auto &j = *static_cast<const json *>(obj);
-    auto unit = resolveUnit(j, canvasUnit);
+    const auto &j    = *static_cast<const json *>(obj);
+    auto        unit = resolveUnit(j, canvasUnit);
 
     ImageItem img;
     img.filePath = j.value("filePath", "");
-    img.x = toPixelsX(j.value("x", 0.0), unit, dpi);
-    img.y = toPixelsY(j.value("y", 0.0), unit, dpi);
+    img.x        = toPixelsX(j.value("x", 0.0), unit, dpi);
+    img.y        = toPixelsY(j.value("y", 0.0), unit, dpi);
     // width/height of 0 means "auto" — only convert when explicitly set
-    double w = j.value("width", 0.0);
-    double h = j.value("height", 0.0);
-    img.width = (w > 0.0) ? toPixelsX(w, unit, dpi) : 0.0;
+    double w   = j.value("width", 0.0);
+    double h   = j.value("height", 0.0);
+    img.width  = (w > 0.0) ? toPixelsX(w, unit, dpi) : 0.0;
     img.height = (h > 0.0) ? toPixelsY(h, unit, dpi) : 0.0;
-    img.z = j.value("z", 0.0);
+    img.z      = j.value("z", 0.0);
     return img;
 }

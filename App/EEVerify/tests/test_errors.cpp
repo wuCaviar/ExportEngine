@@ -1,8 +1,8 @@
 // Error-code unification tests
 // ============================================================================
 // Tests for the EEError domain and the error_code migration of core
-// components (JsonSceneParser, ColorConverter, TiffWriter, FontEngine,
-// json2tiff). Links ExportEngine.dll (unlike test_validator).
+// components (JsonSceneParser, LcmsColorConverter, TiffWriter, json2tiff).
+// Links ExportEngine.dll (unlike test_validator).
 // ============================================================================
 
 #include "EEError.h"
@@ -11,14 +11,12 @@
 #include "PredecodeScheduler.h"
 #include "RenderContext.h"
 #include "ImageRenderer.h"
-#include "ColorConverter.h"
-#include "ColorTransform.h"
-#include "NearestResampler.h"
+#include "LcmsColorConverter.h"
+#include "VipsResampler.h"
 #include "SceneData.h"
 #include "SceneRenderer.h"
 #include "TiffWriter.h"
 #include "MemorySink.h"
-#include "FontEngine.h"
 #include "TextureSource.h"
 #include "test_harness.h"
 
@@ -421,11 +419,11 @@ TEST(parse_rect_fill_mutual_exclusion_texture_wins)
     EXPECT_TRUE(!r.gridFill.has_value());
 }
 
-// ── ColorConverter ─────────────────────────────────────────────────────────
+// ── LcmsColorConverter ─────────────────────────────────────────────────────────
 
 TEST(converter_open_missing)
 {
-    ColorConverter cv;
+    LcmsColorConverter cv;
     auto ec = cv.loadProfile("no/such/rgb.icc", "no/such/cmyk.icc");
     EXPECT_TRUE(ec == EEError::icc_open_failed);
 }
@@ -442,7 +440,7 @@ TEST(converter_parse_garbage)
     { std::ofstream f(rgb); f << "this is not an icc profile"; }
     { std::ofstream f(cmyk); f << "this is not an icc profile either"; }
 
-    ColorConverter cv;
+    LcmsColorConverter cv;
     auto ec = cv.loadProfile(rgb.string(), cmyk.string());
 
     fs::remove(rgb);
@@ -453,7 +451,7 @@ TEST(converter_parse_garbage)
 
 TEST(converter_not_initialized)
 {
-    ColorConverter cv;
+    LcmsColorConverter cv;
     std::vector<uint8_t> out;
     EXPECT_FALSE(cv.getProfileBytes(out));
     EXPECT_TRUE(cv.errorCode() == EEError::icc_not_initialized);
@@ -515,38 +513,6 @@ TEST(tiff_resolution_tags_anisotropic)
     TIFFClose(tif);
     EXPECT_EQ(static_cast<int>(xres + 0.5f), 300);
     EXPECT_EQ(static_cast<int>(yres + 0.5f), 600);
-}
-
-// ── FontEngine ─────────────────────────────────────────────────────────────
-
-TEST(font_init_success)
-{
-    FontEngine fe;
-    EXPECT_TRUE(!fe.init());
-}
-
-TEST(font_invalid_name_empty)
-{
-    FontEngine fe;
-    fe.init();
-    auto ec = fe.loadFont("", 12.0, false, false);
-    EXPECT_TRUE(ec == EEError::font_invalid_family_name);
-}
-
-TEST(font_invalid_name_path_traversal)
-{
-    FontEngine fe;
-    fe.init();
-    auto ec = fe.loadFont("..", 12.0, false, false);
-    EXPECT_TRUE(ec == EEError::font_invalid_family_name);
-}
-
-TEST(font_not_found)
-{
-    FontEngine fe;
-    fe.init();
-    auto ec = fe.loadFont("NoSuchFontFamilyXyz_12345", 12.0, false, false);
-    EXPECT_TRUE(ec == EEError::font_not_found);
 }
 
 // ── json2tiff 边界 ─────────────────────────────────────────────────────────
@@ -842,9 +808,9 @@ bool makeRgbaTiff(const std::string &path)
 // 纹理解码必须经 lcms2 转 CMYK（与图片图元一致：lcms 不可用即解码失败，
 // 无朴素公式回退），故测试需传已加载的 cv，不能用 nullptr。
 // profile 文件来自项目 ICC Profile/ 目录（TEST_SOURCE_DIR = 仓库根）。
-ColorConverter &loadedTextureConverter()
+LcmsColorConverter &loadedTextureConverter()
 {
-    static ColorConverter cv;
+    static LcmsColorConverter cv;
     static bool loaded = false;
     if (!loaded) {
         loaded = true;
@@ -988,7 +954,7 @@ TEST(image_tiff_resize_chunked_conversion_matches_reference)
     fs::remove(tifPath);
 }
 
-// 流式（strip 逐段解码+缩放）在非整数放大下必须与整幅 NearestResampler 逐字节一致。
+// 流式（strip 逐段解码+缩放）在非整数放大下必须与整幅 VipsResampler 逐字节一致。
 TEST(image_tiff_resize_streaming_matches_whole_resize)
 {
     ensureVipsInit();
@@ -1037,7 +1003,7 @@ TEST(image_tiff_resize_streaming_matches_whole_resize)
     EXPECT_TRUE(convertChunked(lcms, src.data(), w, h, 3, cmykSrc, 7));
 
     std::vector<uint8_t> expected(static_cast<size_t>(dw) * dh * 4);
-    NearestResampler().resize(cmykSrc.data(), w, h, expected.data(), dw, dh, 4);
+    VipsResampler().resize(cmykSrc.data(), w, h, expected.data(), dw, dh, 4);
 
     EXPECT_TRUE(ctx.cmykBuf == expected);
     fs::remove(tifPath);

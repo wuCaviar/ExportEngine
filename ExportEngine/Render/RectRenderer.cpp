@@ -16,9 +16,9 @@ void RectRenderer::draw(RenderContext &ctx, const Rect &rect, const Dpi &canvasD
 
     // Texture fill source (created once per draw — decoded frames are
     // shared through TextureSource's static cache)
-    bool hasTexture = rect.textureFill.has_value();
+    bool                           hasTexture = rect.textureFill.has_value();
     std::unique_ptr<TextureSource> texSrc;
-    double tileW = 0.0, tileH = 0.0;
+    double                         tileW = 0.0, tileH = 0.0;
     if (hasTexture) {
         const TextureFill &tf = *rect.textureFill;
         if (tf.filePath.empty()) {
@@ -26,8 +26,8 @@ void RectRenderer::draw(RenderContext &ctx, const Rect &rect, const Dpi &canvasD
         } else {
             int overrideW = tf.useOriginalSize ? 0 : static_cast<int>(tf.customWidth + 0.5);
             int overrideH = tf.useOriginalSize ? 0 : static_cast<int>(tf.customHeight + 0.5);
-            texSrc = std::make_unique<TextureSource>(
-                tf.filePath, canvasDpi, ctx.converter, overrideW, overrideH);
+            texSrc        = std::make_unique<TextureSource>(tf.filePath, canvasDpi, ctx.converter,
+                                                            overrideW, overrideH);
             if (!texSrc->ok()) {
                 hasTexture = false;
                 texSrc.reset();
@@ -38,22 +38,22 @@ void RectRenderer::draw(RenderContext &ctx, const Rect &rect, const Dpi &canvasD
         }
     }
 
-    double cx = rect.x + rect.width / 2.0;
-    double cy = rect.y + rect.height / 2.0;
+    double cx    = rect.x + rect.width / 2.0;
+    double cy    = rect.y + rect.height / 2.0;
     double halfW = rect.width / 2.0;
     double halfH = rect.height / 2.0;
 
-    bool hasGradient = rect.gradient.has_value();
-    bool hasGrid = rect.gridFill.has_value();
+    bool hasGradient  = rect.gradient.has_value();
+    bool hasGrid      = rect.gridFill.has_value();
     bool hasSolidFill = !hasGradient && !hasGrid && !hasTexture && rect.fillColor.alpha > 0.0;
-    bool hasFill = hasGradient || hasGrid || hasSolidFill || hasTexture;
+    bool hasFill      = hasGradient || hasGrid || hasSolidFill || hasTexture;
 
     uint8_t fc1 = 0, fc2 = 0, fc3 = 0, fc4 = 0, fa = 0;
     if (hasSolidFill)
         ctx.prepareColor(rect.fillColor, fc1, fc2, fc3, fc4, fa);
 
-    double r = rect.cornerRadius;
-    bool useRounded = r > 0.0;
+    double r          = rect.cornerRadius;
+    bool   useRounded = r > 0.0;
 
     // Compute bounding box（无旋转，轴对齐）
     double bMinX = rect.x, bMaxX = rect.x + rect.width;
@@ -65,18 +65,18 @@ void RectRenderer::draw(RenderContext &ctx, const Rect &rect, const Dpi &canvasD
     if (hasStroke)
         ctx.prepareColor(rect.strokeColor, sc1, sc2, sc3, sc4, sa);
 
-    bool useSdfStroke = hasStroke && rect.lineStyle == LineStyle::Solid;
-    double halfSW = rect.strokeWidth * 0.5;
+    bool   useSdfStroke = hasStroke && rect.lineStyle == LineStyle::Solid;
+    double halfSW       = rect.strokeWidth * 0.5;
 
     // Clip bounds in canvas coordinates (tileW>0 means tiled rendering)
     int clipX0 = (ctx.tileW > 0) ? ctx.tileX : 0;
     int clipY0 = (ctx.tileW > 0) ? ctx.tileY : 0;
     int clipX1 = (ctx.tileW > 0) ? ctx.tileX + ctx.tileW - 1 : ctx.canvasWidth - 1;
     int clipY1 = (ctx.tileW > 0) ? ctx.tileY + ctx.tileH - 1 : ctx.canvasHeight - 1;
-    int x0 = std::max(clipX0, static_cast<int>(std::floor(bMinX - halfSW)));
-    int x1 = std::min(clipX1, static_cast<int>(std::ceil(bMaxX + halfSW)));
-    int y0 = std::max(clipY0, static_cast<int>(std::floor(bMinY - halfSW)));
-    int y1 = std::min(clipY1, static_cast<int>(std::ceil(bMaxY + halfSW)));
+    int x0     = std::max(clipX0, static_cast<int>(std::floor(bMinX - halfSW)));
+    int x1     = std::min(clipX1, static_cast<int>(std::ceil(bMaxX + halfSW)));
+    int y0     = std::max(clipY0, static_cast<int>(std::floor(bMinY - halfSW)));
+    int y1     = std::min(clipY1, static_cast<int>(std::ceil(bMaxY + halfSW)));
 
     // Per-pixel loop (fill + SDF stroke)
     if (hasFill || useSdfStroke) {
@@ -101,16 +101,16 @@ void RectRenderer::draw(RenderContext &ctx, const Rect &rect, const Dpi &canvasD
                         ctx.evalGradient(*rect.gradient, gx, gy, gfc1, gfc2, gfc3, gfc4, gfa);
                     } else if (hasGrid) {
                         if (!ctx.evalGridFill(*rect.gridFill, localX + halfW, localY + halfH,
-                                rect.width, rect.height, gfc1, gfc2, gfc3, gfc4, gfa))
+                                              rect.width, rect.height, gfc1, gfc2, gfc3, gfc4, gfa))
                             gfa = 0; // invalid grid params — skip fill (parse already warned)
                     } else if (hasTexture) {
                         // Tile coordinate in the unrotated rect-local space,
                         // wrapped by the pattern cell (floorMod → [0, tile)).
                         const TextureFill &tf = *rect.textureFill;
-                        double rx = localX + halfW + tf.offsetX;
-                        double ry = localY + halfH + tf.offsetY;
-                        double u = RenderMath::floorMod(rx, tileW) / tileW;
-                        double v = RenderMath::floorMod(ry, tileH) / tileH;
+                        double             rx = localX + halfW + tf.offsetX;
+                        double             ry = localY + halfH + tf.offsetY;
+                        double             u  = RenderMath::floorMod(rx, tileW) / tileW;
+                        double             v  = RenderMath::floorMod(ry, tileH) / tileH;
                         if (!texSrc->sample(u, v, gfc1, gfc2, gfc3, gfc4, gfa))
                             gfa = 0; // sample failure — skip this pixel
                     }
@@ -135,7 +135,7 @@ void RectRenderer::draw(RenderContext &ctx, const Rect &rect, const Dpi &canvasD
     // Cairo stroke for dashed / dotted lines (non-solid styles)
     if (hasStroke && !useSdfStroke) {
         double clampedR = useRounded ? std::min(r, std::min(halfW, halfH)) : 0.0;
-        double pad = rect.strokeWidth * 0.5 + 2.0;
+        double pad      = rect.strokeWidth * 0.5 + 2.0;
 
         CairoStroke::PathBuilder buildPath = [&](cairo_t *cr) {
             // Translate to rect centre, then build the local-coord path.
@@ -165,6 +165,6 @@ void RectRenderer::draw(RenderContext &ctx, const Rect &rect, const Dpi &canvasD
         };
 
         CairoStroke::render(ctx, buildPath, rect.strokeWidth, rect.lineStyle, rect.strokeColor, sc1,
-            sc2, sc3, sc4, sa, bMinX - pad, bMinY - pad, bMaxX + pad, bMaxY + pad);
+                            sc2, sc3, sc4, sa, bMinX - pad, bMinY - pad, bMaxX + pad, bMaxY + pad);
     }
 }

@@ -10,9 +10,9 @@ struct TaskProgress
 {
     std::string taskId;
     std::string status; // "idle" | "running" | "done" | "error"
-    int current = 0;
-    int total = 0;
-    double percent = 0.0;
+    int         current = 0;
+    int         total   = 0;
+    double      percent = 0.0;
     std::string message;
 };
 
@@ -28,12 +28,12 @@ public:
     void failTask(const std::string &taskId, const std::string &message = "");
 
     // Query
-    TaskProgress getTask(const std::string &taskId) const;
+    TaskProgress                                  getTask(const std::string &taskId) const;
     std::unordered_map<std::string, TaskProgress> getAllTasks() const;
 
 private:
     ProgressManager() = default;
-    mutable std::mutex m_mutex;
+    mutable std::mutex                            m_mutex;
     std::unordered_map<std::string, TaskProgress> m_tasks;
 };
 

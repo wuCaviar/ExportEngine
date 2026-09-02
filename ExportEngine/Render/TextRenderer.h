@@ -4,10 +4,8 @@
 
 namespace ATHC::EE {
 
-class FontEngine;
-
 namespace TextRenderer {
-void draw(RenderContext &ctx, const Text &text, FontEngine *fontEngine, const Dpi &dpi);
+void draw(RenderContext &ctx, const Text &text, const Dpi &dpi);
 }
 
 } // namespace ATHC::EE

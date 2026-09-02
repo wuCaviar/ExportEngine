@@ -2,9 +2,10 @@
 #include "RenderContext.h"
 #include "SceneData.h"
 
-// CMYK TIFF 图像渲染，采用条带/波段流式处理以限制内存使用。
-// 源在渲染时按波段进行解码 + 颜色转换 + 缩放（永远不会生成完整的重采样帧）。
-// 峰值内存 ≈ 一个源波段 + 请求的输出行。
+// CMYK TIFF image rendering with strip/band streaming to bound memory usage.
+// Sources decode + colour-convert + scale per band at render time (no full
+// resampled frame is ever materialized). Peak memory ≈ one source band +
+// the requested output rows.
 
 namespace ATHC::EE {
 
@@ -15,11 +16,11 @@ namespace ImageRenderer {
 
 void draw(RenderContext &ctx, const ImageItem &img, const Dpi &dpi);
 
-/// 对图像图元进行廉价的早期验证（头部/变换探测），以便
-/// 无法读取或无法转换的文件一次性被标记为坏文件。源在渲染时惰性解码，
-/// 因此没有可预热的帧。失败时返回 false（已标记为坏——渲染将跳过）。
-bool preDecode(
-    const ImageItem &img, const Dpi &dpi, IColorConverter *cv, IResampler *resampler);
+/// Cheap early validation of an image primitive (header/transform probe) so
+/// unreadable or unconvertible files are marked bad once, up front. Sources
+/// decode lazily at render time, so there is no frame to warm. Returns false
+/// on failure (already marked bad — render will skip).
+bool preDecode(const ImageItem &img, const Dpi &dpi, IColorConverter *cv, IResampler *resampler);
 
 } // namespace ImageRenderer
 

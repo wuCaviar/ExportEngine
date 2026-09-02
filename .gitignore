@@ -1,48 +1,79 @@
-```
-# Build artifacts
+# ============================================================
+# 编译产物
+# ============================================================
+
+# 目标文件
 *.o
 *.obj
+
+# 预编译头
+*.gch
+*.pch
+
+# 静态库
 *.a
 *.lib
-*.dll
+
+# 动态库
 *.so
+*.so.*
+*.dll
 *.dylib
+
+# 可执行文件
 *.exe
 *.out
+*.app
 
-# Dependencies
-node_modules/
-venv/
-.venv/
+# Python 脚本缓存（Script/ 下的脚本运行时产生）
 __pycache__/
-.mypy_cache/
-.pytest_cache/
-.coverage
-coverage/
-htmlcov/
+*.pyc
 
-# IDE and editor files
-.vscode/
-.idea/
-*.swp
-*.swo
-*.tmp
+# ============================================================
+# 构建与输出目录
+# ============================================================
 
-# Logs
-*.log
-
-# Distribution and build directories
-dist/
 build/
-target/
-.gradle/
+bin/
+Build*
+*build-*
+install/
+output/
 
-# System files
-.DS_Store
-Thumbs.db
+# ============================================================
+# 渲染输出产物（TIFF）
+# ============================================================
 
-# Environment files
-.env
-.env.local
-*.env.*
-```
+*.tif
+
+# ============================================================
+# IDE 与编辑器配置
+# ============================================================
+
+.vs/
+.vscode/
+compile_commands.json
+*.user
+
+# ============================================================
+# 开发工具与缓存（Claude Code / codegraph / clangd 等）
+# ============================================================
+
+.claude/
+.agents
+.cache/
+.codegraph/
+.superpowers/
+
+# 文档输出目录（Doc/ 为占位空目录）
+docs/
+Doc/
+plans/
+specs/
+
+# ============================================================
+# 开发辅助脚本（Script/ 下的临时脚本，按需提交）
+# ============================================================
+
+/Script/*.js
+/Script/*.ps1

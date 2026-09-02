@@ -45,7 +45,7 @@ DerivePointerAlignment: false
 
 # ── 模板 ──────────────────────────────────────────────
 SpaceAfterTemplateKeyword: false
-AlwaysBreakTemplateDeclarations: MultiLine
+AlwaysBreakTemplateDeclarations: Yes
 
 # ── 构造 / 继承初始化列表 ─────────────────────────────
 BreakConstructorInitializers: BeforeComma
@@ -70,11 +70,16 @@ SpacesInContainerLiterals: false
 SpacesInSquareBrackets: false
 
 # ── 对齐 ──────────────────────────────────────────────
+AlignAfterOpenBracket: Align
 AlignOperands: true
-AlignTrailingComments: false
-AlignConsecutiveAssignments: false
-AlignConsecutiveDeclarations: false
+AlignTrailingComments:
+  Kind: Always
+  OverEmptyLines: 1 # 仅当注释间没有空行时对齐
+
+AlignConsecutiveAssignments: true
+AlignConsecutiveDeclarations: true
 AlignEscapedNewlines: Left
+BinPackParameters: false
 
 # ── 短语句 ────────────────────────────────────────────
 AllowShortFunctionsOnASingleLine: Inline

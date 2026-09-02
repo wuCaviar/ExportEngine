@@ -10,12 +10,12 @@ namespace ATHC::EE {
 
 enum class LineStyle : uint8_t
 {
-    Solid = 0,
-    Dashed = 1,
-    Dotted = 2,
-    DashDot = 3,
+    Solid         = 0,
+    Dashed        = 1,
+    Dotted        = 2,
+    DashDot       = 3,
     DoubleDotDash = 4,
-    None = 5,
+    None          = 5,
 };
 
 struct Color
@@ -41,129 +41,135 @@ struct Gradient
 {
     enum Type : uint8_t
     {
-        NONE = 0,
+        NONE   = 0,
         LINEAR = 1,
         RADIAL = 2,
-        CONIC = 3
+        CONIC  = 3
     };
     Type type = NONE;
 
     struct Stop
     {
         double offset = 0.0;
-        Color color;
+        Color  color;
     };
     std::vector<Stop> stops;
 
     double x1 = 0.0, y1 = 0.0;
     double x2 = 1.0, y2 = 0.0;
     double cx = 0.5, cy = 0.5;
-    double r = 0.5;
+    double r          = 0.5;
     double startAngle = 0.0;
 };
 
 struct GridFill
 {
-    Color gridColor; // 网格线颜色
-    Color backgroundColor; // 背景色（transparentBackground 时不可用）
-    bool transparentBackground = false;
-    double cellWidth = 10.0; // 格子宽（固定 1mm，按画布 dpi 换算为像素）
-    double cellHeight = 10.0; // 格子高（固定 1mm，按画布 dpi 换算为像素）
-    double lineWidth = 1.0; // 网格线宽（固定 1px）
+    Color  gridColor;                    // 网格线颜色
+    Color  backgroundColor;              // 背景色（transparentBackground 时不可用）
+    bool   transparentBackground = false;
+    double cellWidth             = 10.0; // 格子宽（固定 1mm，按画布 dpi 换算为像素）
+    double cellHeight            = 10.0; // 格子高（固定 1mm，按画布 dpi 换算为像素）
+    double lineWidth             = 1.0;  // 网格线宽（固定 1px）
 };
 
 struct TextureFill
 {
     std::string filePath;
-    double offsetX = 0.0; // 水平偏移（画布单位，解析后为像素）
-    double offsetY = 0.0; // 垂直偏移（画布单位，解析后为像素）
-    bool useOriginalSize = false; // 使用原图大小
-    double customWidth = 0.0; // 自定义宽（useOriginalSize 时不可用）
-    double customHeight = 0.0; // 自定义高（useOriginalSize 时不可用）
+    double      offsetX         = 0.0;   // 水平偏移（画布单位，解析后为像素）
+    double      offsetY         = 0.0;   // 垂直偏移（画布单位，解析后为像素）
+    bool        useOriginalSize = false; // 使用原图大小
+    double      customWidth     = 0.0;   // 自定义宽（useOriginalSize 时不可用）
+    double      customHeight    = 0.0;   // 自定义高（useOriginalSize 时不可用）
 };
 
 struct Rect
 {
-    double x = 0.0;
-    double y = 0.0;
-    double width = 0.0;
-    double height = 0.0;
-    double z = 0.0;
-    double strokeWidth = 0.0;
-    Color strokeColor;
-    Color fillColor;
-    std::optional<Gradient> gradient;
-    std::optional<GridFill> gridFill;
+    double                     x           = 0.0;
+    double                     y           = 0.0;
+    double                     width       = 0.0;
+    double                     height      = 0.0;
+    double                     z           = 0.0;
+    double                     strokeWidth = 0.0;
+    Color                      strokeColor;
+    Color                      fillColor;
+    std::optional<Gradient>    gradient;
+    std::optional<GridFill>    gridFill;
     std::optional<TextureFill> textureFill;
-    double cornerRadius = 0.0;
-    LineStyle lineStyle = LineStyle::Solid;
+    double                     cornerRadius = 0.0;
+    LineStyle                  lineStyle    = LineStyle::Solid;
 };
 
 struct Circle
 {
-    double cx = 0.0;
-    double cy = 0.0;
-    double radiusX = 0.0;
-    double radiusY = 0.0;
-    double z = 0.0;
-    double strokeWidth = 0.0;
-    Color strokeColor;
-    Color fillColor;
+    double                  cx          = 0.0;
+    double                  cy          = 0.0;
+    double                  radiusX     = 0.0;
+    double                  radiusY     = 0.0;
+    double                  z           = 0.0;
+    double                  strokeWidth = 0.0;
+    Color                   strokeColor;
+    Color                   fillColor;
     std::optional<Gradient> gradient;
-    LineStyle lineStyle = LineStyle::Solid;
+    LineStyle               lineStyle = LineStyle::Solid;
 };
 
 struct FreeLine
 {
     std::vector<std::pair<double, double>> points;
-    double z = 0.0;
-    double strokeWidth = 1.0;
-    Color strokeColor;
-    LineStyle lineStyle = LineStyle::Solid;
+    double                                 z           = 0.0;
+    double                                 strokeWidth = 1.0;
+    Color                                  strokeColor;
+    LineStyle                              lineStyle = LineStyle::Solid;
 };
 
 struct BezierCurve
 {
     std::vector<std::pair<double, double>> controlPoints;
-    double z = 0.0;
-    double strokeWidth = 1.0;
-    Color strokeColor;
-    LineStyle lineStyle = LineStyle::Solid;
+    double                                 z           = 0.0;
+    double                                 strokeWidth = 1.0;
+    Color                                  strokeColor;
+    LineStyle                              lineStyle = LineStyle::Solid;
 };
 
 struct Line
 {
-    double x1 = 0.0;
-    double y1 = 0.0;
-    double x2 = 0.0;
-    double y2 = 0.0;
-    double z = 0.0;
-    double strokeWidth = 1.0;
-    Color strokeColor;
+    double    x1          = 0.0;
+    double    y1          = 0.0;
+    double    x2          = 0.0;
+    double    y2          = 0.0;
+    double    z           = 0.0;
+    double    strokeWidth = 1.0;
+    Color     strokeColor;
     LineStyle lineStyle = LineStyle::Solid;
 };
 
 struct ImageItem
 {
     std::string filePath;
-    double x = 0.0;
-    double y = 0.0;
-    double width = 0.0;
-    double height = 0.0;
-    double z = 0.0;
+    double      x      = 0.0;
+    double      y      = 0.0;
+    double      width  = 0.0;
+    double      height = 0.0;
+    double      z      = 0.0;
 };
 
 struct Text
 {
-    double x = 0.0;
-    double y = 0.0;
-    double z = 0.0;
+    double      x         = 0.0;
+    double      y         = 0.0;
+    double      z         = 0.0;
+    double      width     = 0.0;
+    double      height    = 0.0;
+    double      fontSize  = 16.0;
+    bool        bold      = false;
+    bool        italic    = false;
+    bool        underline = false;
     std::string content;
     std::string fontFamily;
-    double fontSize = 16.0;
-    bool bold = false;
-    bool italic = false;
-    Color textColor;
+    Color       textColor;
+    // Target box in pixels (already unit-converted). 0 = natural size at the
+    // given fontSize — the Pango layout is non-uniformly scaled (X/Y
+    // independent) to exactly width×height when both are set.
 };
 
 // 画布分辨率。x = 水平（X 方向）DPI，y = 垂直（Y 方向）DPI。
@@ -176,21 +182,21 @@ struct Dpi
 
 struct Canvas
 {
-    int width = 0;
-    int height = 0;
-    Dpi dpi;
-    Color background;
-    std::vector<Rect> rects;
-    std::vector<Circle> circles;
-    std::vector<FreeLine> freeLines;
+    int                      width  = 0;
+    int                      height = 0;
+    Dpi                      dpi;
+    Color                    background;
+    std::vector<Rect>        rects;
+    std::vector<Circle>      circles;
+    std::vector<FreeLine>    freeLines;
     std::vector<BezierCurve> bezierCurves;
-    std::vector<Line> lines;
-    std::vector<Text> texts;
-    std::vector<ImageItem> images;
+    std::vector<Line>        lines;
+    std::vector<Text>        texts;
+    std::vector<ImageItem>   images;
 
     // Multi-channel output: discovered by pre-scanning image TIFFs.
     // Default 4 = standard CMYK; >4 adds extra samples (spot colors, etc.)
-    int samplesPerPixel = 4;
+    int                   samplesPerPixel = 4;
     std::vector<uint16_t> sampleInfo;
 };
 

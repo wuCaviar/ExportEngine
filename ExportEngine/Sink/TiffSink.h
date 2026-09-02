@@ -31,8 +31,8 @@ public:
     bool end() override;
 
 private:
-    TiffWriter *m_writer;
-    std::string m_path;
+    TiffWriter    *m_writer;
+    std::string    m_path;
     SinkDescriptor m_desc;
 };
 

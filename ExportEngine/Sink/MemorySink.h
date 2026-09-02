@@ -25,15 +25,15 @@ public:
         m_desc = desc;
         m_frame.assign(static_cast<size_t>(desc.width) * static_cast<size_t>(desc.height)
                            * static_cast<size_t>(desc.samplesPerPixel),
-            0);
+                       0);
         return true;
     }
 
     bool writeStrip(int startRow, int rows, std::vector<uint8_t> cmyk) override
     {
         const size_t rowBytes = static_cast<size_t>(m_desc.width) * m_desc.samplesPerPixel;
-        const size_t off = static_cast<size_t>(startRow) * rowBytes;
-        const size_t n = static_cast<size_t>(rows) * rowBytes;
+        const size_t off      = static_cast<size_t>(startRow) * rowBytes;
+        const size_t n        = static_cast<size_t>(rows) * rowBytes;
         if (cmyk.size() < n || off + n > m_frame.size()) {
             setError(EEError::sink_not_initialized);
             return false;
@@ -45,10 +45,10 @@ public:
     bool end() override { return true; }
 
     const std::vector<uint8_t> &frame() const { return m_frame; }
-    const SinkDescriptor &descriptor() const { return m_desc; }
+    const SinkDescriptor       &descriptor() const { return m_desc; }
 
 private:
-    SinkDescriptor m_desc;
+    SinkDescriptor       m_desc;
     std::vector<uint8_t> m_frame;
 };
 

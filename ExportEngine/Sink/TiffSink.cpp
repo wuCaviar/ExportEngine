@@ -1,7 +1,7 @@
 #include "TiffSink.h"
 
 #include "TiffWriter.h"
-#include "TiffHelper.h"
+#include "FileUtil.h"
 #include "IccProfile.h"
 #include "Log.h"
 
@@ -32,7 +32,7 @@ bool TiffSink::begin(const SinkDescriptor &desc)
     m_desc = desc;
 
     // 输出目录（与旧 json2tiff 行为一致：写前创建父目录）
-    fs::path outPath(TiffHelper::Utf8ToWide(m_path));
+    fs::path outPath(FileUtil::Utf8ToWide(m_path));
     if (outPath.has_parent_path()) {
         std::error_code ec;
         fs::create_directories(outPath.parent_path(), ec);
@@ -46,12 +46,12 @@ bool TiffSink::begin(const SinkDescriptor &desc)
     // EE 不提取、不传递 ICC 字节。
     const std::vector<uint8_t> iccBytes = IccProfile::readBytes(IccProfile::kDefaultCmyk);
 
-    const int rps = preferredRowsPerStrip(desc.width, desc.height);
+    const int rps        = preferredRowsPerStrip(desc.width, desc.height);
     const int stripCount = (desc.height + rps - 1) / rps;
     EELog::info("  Write mode: Strip");
     EELog::info("  Strips: {} ({} rows/strip)", stripCount, rps);
     const bool ok = m_writer->beginStripWrite(m_path, desc.width, desc.height, desc.dpi, rps,
-        iccBytes, desc.samplesPerPixel, desc.sampleInfo);
+                                              iccBytes, desc.samplesPerPixel, desc.sampleInfo);
 
     if (!ok)
         setError(m_writer->errorCode());
@@ -70,7 +70,7 @@ bool TiffSink::end()
 {
     const bool ok = m_writer->endStripWrite();
     if (ok) {
-        const int rps = preferredRowsPerStrip(m_desc.width, m_desc.height);
+        const int rps        = preferredRowsPerStrip(m_desc.width, m_desc.height);
         const int stripCount = (m_desc.height + rps - 1) / rps;
         EELog::info("  {} strips written", stripCount);
         return true;

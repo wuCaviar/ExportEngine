@@ -6,7 +6,6 @@ add_library(ExportEngine SHARED
     Core/JsonSceneParser.cpp
     Core/SceneRenderer.cpp
     Core/RenderContext.cpp
-    Core/IccProfile.cpp
     Core/ProgressManager.cpp
     Core/Version.cpp
     Core/Log.cpp
@@ -14,13 +13,14 @@ add_library(ExportEngine SHARED
     # Sink
     Sink/TiffSink.cpp
     Sink/TiffWriter.cpp
-
+    
     # Sampling
-    Sampling/NearestResampler.cpp
-
+    Sampling/VipsResampler.cpp
+    
     # Color
-    Color/ColorConverter.cpp
-    Color/ColorTransform.cpp
+    Color/IccProfile.cpp
+    Color/LcmsColorConverter.cpp
+    # Color/MuPDFColorConverter.cpp
 
     # Render
     Render/RectRenderer.cpp
@@ -29,19 +29,7 @@ add_library(ExportEngine SHARED
     Render/ImageRenderer.cpp
     Render/TextureSource.cpp
     Render/TextRenderer.cpp
-
-    # Font
-    Font/FontEngine.cpp
 )
-
-# Platform-specific font lookup
-if(WIN32)
-    target_sources(ExportEngine PRIVATE Font/FontEngine_win.cpp)
-elseif(APPLE)
-    target_sources(ExportEngine PRIVATE Font/FontEngine_mac.mm)
-else()
-    target_sources(ExportEngine PRIVATE Font/FontEngine_linux.cpp)
-endif()
 
 target_include_directories(ExportEngine
     PUBLIC
@@ -53,7 +41,6 @@ target_include_directories(ExportEngine
         "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/Render
-        ${CMAKE_CURRENT_SOURCE_DIR}/Font
 )
 
 target_compile_definitions(ExportEngine PRIVATE
@@ -77,19 +64,15 @@ target_link_libraries(ExportEngine
     PRIVATE
         tiff
         lcms2
-        freetype
         cairo
+        pangocairo
         spdlog_vcpkg
         atcodebase_headers
+        # libmupdf
 )
 
 if(APPLE)
-    find_library(COREFOUNDATION CoreFoundation)
-    find_library(CORETEXT CoreText)
-    target_link_libraries(ExportEngine PRIVATE
-        ${COREFOUNDATION} ${CORETEXT}
-        PkgConfig::vips
-    )
+    target_link_libraries(ExportEngine PRIVATE PkgConfig::vips)
 elseif(WIN32)
     target_link_libraries(ExportEngine PRIVATE vips)
 endif()

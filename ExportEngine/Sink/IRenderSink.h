@@ -38,17 +38,17 @@ enum class SinkGranularity : uint8_t
 {
     Frame = 0,
     Strip = 1,
-    Row = 2,
+    Row   = 2,
 };
 
 // begin() 前一次性下发的输出元数据。接收器据此构造输出（文件头 / 缓冲 / 编码器）。
 struct SinkDescriptor
 {
-    int width = 0;
-    int height = 0;
-    Dpi dpi{};
-    int samplesPerPixel = 4; // 像素步长（4 = 标准 CMYK，>4 = 多通道/专色）
-    std::vector<uint16_t> sampleInfo; // EXTRASAMPLES（多通道时非空，CMYK 时为空）
+    int                   width  = 0;
+    int                   height = 0;
+    Dpi                   dpi{};
+    int                   samplesPerPixel = 4; // 像素步长（4 = 标准 CMYK，>4 = 多通道/专色）
+    std::vector<uint16_t> sampleInfo;          // EXTRASAMPLES（多通道时非空，CMYK 时为空）
 };
 
 class EE_API IRenderSink
@@ -73,7 +73,7 @@ public:
 
     // 生命周期。begin/end 各调用一次，且都在编排线程（单线程）。
     virtual bool begin(const SinkDescriptor &desc) = 0;
-    virtual bool end() = 0;
+    virtual bool end()                             = 0;
 
     // 数据入口。只实现 granularity() 声明的那一个；其余默认置
     // EEError::sink_unsupported_granularity 并返回 false。
@@ -93,7 +93,7 @@ protected:
 
 private:
     mutable std::mutex m_mtx;
-    std::error_code m_error;
+    std::error_code    m_error;
 };
 
 // ── 默认实现：未实现的粒度入口 ──────────────────────────────────────────

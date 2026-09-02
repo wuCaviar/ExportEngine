@@ -32,8 +32,8 @@ inline uint64_t estimateDecodeCost(uint64_t srcW, uint64_t srcH, uint64_t chans)
     const uint64_t cost = srcW * srcH * chans * 3 / 2; // decode transient (×1.5)
     return cost == 0 ? 1 : cost;
 }
-inline std::vector<std::vector<size_t>> schedulePredecodeWaves(
-    const std::vector<uint64_t> &costs, uint64_t budget, size_t maxParallel)
+inline std::vector<std::vector<size_t>>
+schedulePredecodeWaves(const std::vector<uint64_t> &costs, uint64_t budget, size_t maxParallel)
 {
     std::vector<std::vector<size_t>> waves;
     if (maxParallel == 0 || costs.empty())
@@ -42,7 +42,7 @@ inline std::vector<std::vector<size_t>> schedulePredecodeWaves(
     size_t i = 0;
     while (i < costs.size()) {
         std::vector<size_t> wave;
-        uint64_t used = 0;
+        uint64_t            used = 0;
         while (i < costs.size() && wave.size() < maxParallel) {
             const uint64_t c = costs[i];
             if (!wave.empty() && used + c > budget)
